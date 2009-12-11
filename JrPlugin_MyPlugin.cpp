@@ -515,10 +515,9 @@ PREFUNCDEF BOOL EFuncName_Request_ItemResultByIndex(int resultindex, char* destb
 
     // ok fill the result data
 
-    *entrytypep = E_EntryType_ALIASFILE;
-
     const FarrItem& item = farrPlugin->getItem(resultindex);
 
+    *entrytypep = E_EntryType_URL;
     util::String::copyString(destbuf_caption, maxlen, item.caption);
     util::String::copyString(destbuf_path, maxlen, item.path);
     util::String::copyString(destbuf_groupname, maxlen, item.group);
@@ -558,13 +557,19 @@ PREFUNCDEF BOOL EFuncName_Request_TextResultCharp(char **charp)
 // Return TRUE to takeover launching and prevent all other further launching
 // or FALSE to continue launching after we return
 //
-PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* /*destbuf_path*/, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT /*entrytype*/, void* /*tagvoidp*/, BOOL* closeafterp)
+PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT /*entrytype*/, void* /*tagvoidp*/, BOOL* closeafterp)
 {
     //TriggerCommand* triggerCommand = (TriggerCommand*)tagvoidp;
 
     if((thispluginid == pluginid) /*&& (triggerCommand != 0)*/)
     {
         //bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
+
+        std::string url = std::string("http://") + destbuf_path;
+
+        SHELLEXECUTEINFO info = { sizeof(SHELLEXECUTEINFO) };
+        info.lpFile = url.c_str();
+        ShellExecuteEx(&info);
 
         *closeafterp = FALSE;
 

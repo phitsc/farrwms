@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\msxml.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Util.h"
 				>
 			</File>

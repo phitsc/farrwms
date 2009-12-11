@@ -3,12 +3,20 @@
 #include "JrPlugin_MyPlugin.h"
 
 #include <sstream>
+#include <regex>
 
 ///////////////////////////////////////////////////////////////////////////////
 
 FarrPlugin::FarrPlugin(const std::string& modulePath) :
     _iconPath(modulePath + "\\icons\\"),
     _helpFile(modulePath + "\\" + ThisPlugin_ReadMeFile)
+{
+    _xmlHttpRequest.CreateInstance(L"Msxml2.XMLHTTP.3.0");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+FarrPlugin::~FarrPlugin()
 {
 }
 
@@ -47,14 +55,44 @@ void FarrPlugin::search(const char* rawSearchString)
     // remove rmilk alias
     searchString.erase(0, _farrAlias.length());
 
-    DWORD start = GetTickCount();
+    if(!searchString.empty())
+    {
+        clearResults();
+
+        setStatusText("searching...");
+
+        DWORD start = GetTickCount();
+
+        const std::string searchUrl = "http://social.msdn.microsoft.com/Search/en-GB?query=" + searchString;
+
+        _xmlHttpRequest->open("GET", searchUrl.c_str(), false);
+        _xmlHttpRequest->send();
+
+        const std::string responseText = _xmlHttpRequest->responseText;
+
+        std::string pattern("<a onmousedown=\".*\" href=\".*\">(.*)</a>\r\n<br/>\r\n<div class=\"ResultDescription\">(.*)</div>\r\n<div class=\"ResultUrl\">(.*)</div>");
+
+        const std::tr1::cregex_iterator::regex_type regexType(pattern);
+
+        std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
+        std::tr1::cregex_iterator end;
+        for( ; it != end; ++it)
+        {
+            const std::tr1::cmatch match = *it;
+            const std::string heading = replaceNcrs(match[1]);
+            const std::string group = replaceNcrs(match[2]);
+            const std::string url = removeHttp(replaceNcrs(match[3]));
+
+            _farrItems.push_back(FarrItem(heading, group, url, ""));
+        }
 
 
-    DWORD delta = GetTickCount() - start;
+        DWORD delta = GetTickCount() - start;
 
-    std::stringstream stream;
-    stream << "Found " << _farrItems.size() << " items in " << (delta / 1000) << " seconds.";
-    setStatusText(stream.str());
+        std::stringstream stream;
+        stream << "Found " << _farrItems.size() << " items in " << (delta / 1000) << " seconds.";
+        setStatusText(stream.str());
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,6 +113,36 @@ extern HINSTANCE dllInstanceHandle;
 //
 //    _farrItems.push_back(FarrItem("Donate", "Support this plugin", "www.donationcoder.com/Forums/bb/index.php?action=dlist;sa=search;search=149485;fields=uid", _iconPath + "Donate.ico", new CallTriggerFunctionCommand(this, &FarrPlugin::goweb, "http://www.donationcoder.com/Forums/bb/index.php?action=dlist;sa=search;search=149485;fields=uid")));
 //}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string FarrPlugin::replaceNcrs(const std::string& text)
+{
+    std::string temp(text);
+
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#33;"), std::string("!"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#39;"), std::string("'"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#40;"), std::string("("));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#41;"), std::string(")"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#47;"), std::string("/"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#58;"), std::string(":"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#61;"), std::string("="));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#63;"), std::string("?"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#124;"), std::string("|"));
+
+    return temp;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string FarrPlugin::removeHttp(const std::string& url)
+{
+    std::string temp(url);
+
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("http://"), std::string(""));
+
+    return temp;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

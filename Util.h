@@ -76,35 +76,6 @@ struct String
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct Date
-{
-    enum FormatDateTimeOptions
-    {
-        FormatDateTimeOption_None            = 0x0,
-        FormatDateTimeOption_DateOnly        = 0x1,
-        FormatDateTimeOption_ShortDate       = 0x2,
-        FormatDateTimeOption_NoWeekdayName   = 0x4,
-        FormatDateTimeOption_ShowSeconds     = 0x8
-    };
-
-    static SYSTEMTIME getSystemTimeFromIso8601Time(const std::string& iso8601Time);
-    static SYSTEMTIME getLocalTimeFromIso8601Time(const std::string& iso8601Time);
-    static std::string getIso8601TimeFromSystemTime(const SYSTEMTIME& dateTime);
-    static std::string formatDateTime(const SYSTEMTIME& systemTime, bool dateOnly, bool useShortDateFormat, bool showSeconds);
-    static std::string formatDateTime(const std::string& iso8601Time, bool dateOnly, bool useShortDateFormat);
-    static std::string formatDateTime(const std::string& iso8601Time, bool dateOnly, bool useShortDateFormat, bool noWeekdayName);
-    static std::string formatDateTime(const SYSTEMTIME& systemTime, FormatDateTimeOptions options);
-    static SYSTEMTIME parseDateTime(const std::string& dateTimeAsString, bool& hasTime);
-    static bool matchesDateTime(const SYSTEMTIME& leftTime, const SYSTEMTIME& rightTime, bool timeMustMatchToo);
-    static long compareDateTime(const SYSTEMTIME& leftTime, const SYSTEMTIME& rightTime, bool timeMustMatchToo);
-    static void setDay(SYSTEMTIME& dateTime, const std::string& day);
-    static void setMonth(SYSTEMTIME& dateTime, const std::string& month);
-    static void setTime(SYSTEMTIME& dateTime, const std::string& hour, const std::string& minute, const std::string& amPM);
-    static void clearDateTimeIfInvalid(SYSTEMTIME& dateTime);
-};
-
-///////////////////////////////////////////////////////////////////////////////
-
 class VersionInfo
 {
     public:
