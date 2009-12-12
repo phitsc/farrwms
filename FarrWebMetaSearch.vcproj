@@ -185,6 +185,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Search.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Util.cpp"
 				>
 			</File>
@@ -220,6 +224,10 @@
 			</File>
 			<File
 				RelativePath=".\msxml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Search.h"
 				>
 			</File>
 			<File

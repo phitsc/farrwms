@@ -1,0 +1,5 @@
+<search>
+	<searchUrl>http://www.gracenote.com/search/?query=</searchUrl>
+	<resultPattern>&lt;div class=&quot;album-meta-data-wrapper&quot;&gt;\n.*&lt;a href=&quot;(.*)&quot;&gt;(.*)&lt;/a&gt;.*\n.*&lt;a href=&quot;.*&quot;&gt;(.*)&lt;/a&gt;</resultPattern>
+	<captionDescriptionUrl>231</captionDescriptionUrl>
+</search>
