@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FarrItem.h"
+#include "Search.h"
 #include "msxml.h"
 
 #include <string>
@@ -20,7 +21,12 @@ public:
     const FarrItem& getItem(const FarrItems::size_type& index) const;
 
 private:
-    void clearResults();
+	Searches _searches;
+
+	void listSearches();
+	void addSearchToResults(const Search& search);
+
+    MSXML2::IXMLHTTPRequestPtr _xmlHttpRequest;
 
     //
     std::string _farrAlias;
@@ -30,12 +36,12 @@ private:
     // task vector for item retrieval by FARR 
     FarrItems _farrItems;
 
-    MSXML2::IXMLHTTPRequestPtr _xmlHttpRequest;
-
+    void clearResults();
 
     // some helper functions
     static std::string replaceNcrs(const std::string& text);
     static std::string removeHttp(const std::string& url);
+	static std::string fixLink(const std::string& link, const std::string& searchUrl);
 
     static void launchFile(const std::string& path);
     static void setStatusText(const std::string& statusText);

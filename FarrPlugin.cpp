@@ -1,15 +1,22 @@
 #include "FarrPlugin.h"
 #include "JrPlugin_GenericShell.h"
 #include "JrPlugin_MyPlugin.h"
+#include "Util.h"
 
 #include <sstream>
 #include <regex>
+
+#include <algorithm>
+#include <functional> 
+
+using namespace std::tr1::placeholders; 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 FarrPlugin::FarrPlugin(const std::string& modulePath) :
     _iconPath(modulePath + "\\icons\\"),
-    _helpFile(modulePath + "\\" + ThisPlugin_ReadMeFile)
+    _helpFile(modulePath + "\\" + ThisPlugin_ReadMeFile),
+	_searches(modulePath + "\\searches\\")
 {
     _xmlHttpRequest.CreateInstance(L"Msxml2.XMLHTTP.3.0");
 }
@@ -55,44 +62,82 @@ void FarrPlugin::search(const char* rawSearchString)
     // remove rmilk alias
     searchString.erase(0, _farrAlias.length());
 
-    if(!searchString.empty())
+    if(searchString.empty())
+	{
+		listSearches();
+	}
+	else
     {
         clearResults();
 
-        setStatusText("searching...");
+		const std::string::size_type pos = searchString.find(' ');
+		if(pos != std::string::npos)
+		{
+			const std::string searchName = searchString.substr(0, pos);
+			const std::string searchTerm = searchString.substr(pos + 1);
 
-        DWORD start = GetTickCount();
+			if(!searchTerm.empty())
+			{
+				Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
+				if(it != _searches.end())
+				{
+					const Search& search = *it;
 
-        const std::string searchUrl = "http://social.msdn.microsoft.com/Search/en-GB?query=" + searchString;
+					const int captionIndex = search.getGroupIndex(Search::Caption);
+					const int descriptionIndex = search.getGroupIndex(Search::Description);
+					const int urlIndex = search.getGroupIndex(Search::Url);
 
-        _xmlHttpRequest->open("GET", searchUrl.c_str(), false);
-        _xmlHttpRequest->send();
+					setStatusText("searching...");
 
-        const std::string responseText = _xmlHttpRequest->responseText;
+					DWORD start = GetTickCount();
 
-        std::string pattern("<a onmousedown=\".*\" href=\".*\">(.*)</a>\r\n<br/>\r\n<div class=\"ResultDescription\">(.*)</div>\r\n<div class=\"ResultUrl\">(.*)</div>");
+					const std::string searchUrl = search.getSearchUrl() + searchTerm;
 
-        const std::tr1::cregex_iterator::regex_type regexType(pattern);
+					_xmlHttpRequest->open("GET", searchUrl.c_str(), false);
+					_xmlHttpRequest->send();
 
-        std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
-        std::tr1::cregex_iterator end;
-        for( ; it != end; ++it)
-        {
-            const std::tr1::cmatch match = *it;
-            const std::string heading = replaceNcrs(match[1]);
-            const std::string group = replaceNcrs(match[2]);
-            const std::string url = removeHttp(replaceNcrs(match[3]));
+					const std::string responseText = _xmlHttpRequest->responseText;
 
-            _farrItems.push_back(FarrItem(heading, group, url, ""));
-        }
+					const std::tr1::cregex_iterator::regex_type regexType(search.getResultPattern());
 
+					std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
+					std::tr1::cregex_iterator end;
+					for( ; it != end; ++it)
+					{
+						const std::tr1::cmatch match = *it;
+						const std::string heading = replaceNcrs(match[captionIndex]);
+						const std::string group = replaceNcrs(match[descriptionIndex]);
+						const std::string link = replaceNcrs(match[urlIndex]);
+						const std::string url = fixLink(link, search.getSearchUrl());
 
-        DWORD delta = GetTickCount() - start;
+						_farrItems.push_back(FarrItem(heading, group, removeHttp(url), search.getIconPath()));
+					}
 
-        std::stringstream stream;
-        stream << "Found " << _farrItems.size() << " items in " << (delta / 1000) << " seconds.";
-        setStatusText(stream.str());
-    }
+					DWORD delta = GetTickCount() - start;
+
+					std::stringstream stream;
+					stream << "Found " << _farrItems.size() << " items in " << (delta / 1000) << " seconds.";
+					setStatusText(stream.str());
+				}
+			}
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::listSearches()
+{
+	clearResults();
+
+	std::for_each(_searches.begin(), _searches.end(), std::tr1::bind(&FarrPlugin::addSearchToResults, this, _1));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::addSearchToResults(const Search& search)
+{
+	_farrItems.push_back(FarrItem(search.getName(), "", _farrAlias + " " + search.getName(), search.getIconPath()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,15 +165,24 @@ std::string FarrPlugin::replaceNcrs(const std::string& text)
 {
     std::string temp(text);
 
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#33;"), std::string("!"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#39;"), std::string("'"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#40;"), std::string("("));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#41;"), std::string(")"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#47;"), std::string("/"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#58;"), std::string(":"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#61;"), std::string("="));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#63;"), std::string("?"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#124;"), std::string("|"));
+	std::string::size_type pos = temp.find("&#");
+	while(pos != std::string::npos)
+	{
+		const std::string::size_type pos2 = temp.find(';', pos + 2);
+		if(pos2 == std::string::npos)
+		{
+			break;
+		}
+
+		const std::string charCode = temp.substr(pos + 2, pos2 - (pos + 2));
+		const char character = static_cast<const char>(util::String::fromString<int>(charCode));
+		if(character >= 32 && character < 127)
+		{
+			temp.replace(pos, pos2 - pos + 1, std::string(1, character));
+		}
+
+		pos = temp.find("&#", pos + 1);
+	}
 
     return temp;
 }
@@ -142,6 +196,26 @@ std::string FarrPlugin::removeHttp(const std::string& url)
     temp = std::tr1::regex_replace(temp, std::tr1::regex("http://"), std::string(""));
 
     return temp;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string FarrPlugin::fixLink(const std::string& link, const std::string& searchUrl)
+{
+	if(!link.empty() && link[0] == '/')
+	{
+		// relative path. add domain.
+		if(searchUrl.find("http://") == 0)
+		{
+			const std::string::size_type pos = searchUrl.find('/', 7); // start after http://
+			if(pos != std::string::npos)
+			{
+				return searchUrl.substr(0, pos) + link;
+			}
+		}
+	}
+
+	return link;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
