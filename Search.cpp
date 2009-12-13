@@ -39,10 +39,6 @@ void Searches::addSearch(const std::string& searchFile)
 		{
 			MSXML2::IXMLDOMNodePtr searchNode = _document->selectSingleNode("search");
 
-			MSXML2::IXMLDOMNodePtr searchUrlNode = searchNode->selectSingleNode("searchUrl");
-			MSXML2::IXMLDOMNodePtr resultPatternNode = searchNode->selectSingleNode("resultPattern");
-			MSXML2::IXMLDOMNodePtr captionDescriptionUrlNode = searchNode->selectSingleNode("captionDescriptionUrl");
-
 			char searchFileName[MAX_PATH] = {0};
 			util::String::copyString(searchFileName, MAX_PATH, searchFile);
 			PathRemoveExtension(searchFileName);
@@ -50,9 +46,11 @@ void Searches::addSearch(const std::string& searchFile)
 			const std::string iconPath = findIconPath(searchFile);
 
 			_searches.push_back(Search(searchName, 
-									   static_cast<const char*>(searchUrlNode->text), 
-									   static_cast<const char*>(resultPatternNode->text), 
-									   static_cast<const char*>(captionDescriptionUrlNode->text),
+									   static_cast<const char*>(searchNode->selectSingleNode("searchUrl")->text), 
+									   static_cast<const char*>(searchNode->selectSingleNode("resultPattern")->text), 
+									   static_cast<const char*>(searchNode->selectSingleNode("farrCaption")->text),
+									   static_cast<const char*>(searchNode->selectSingleNode("farrGroup")->text),
+									   static_cast<const char*>(searchNode->selectSingleNode("farrPath")->text),
 									   iconPath));
 		}
 		else
@@ -97,15 +95,22 @@ std::string Searches::findIconPath(const std::string& searchFile)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-Search::Search(const std::string& name, const std::string& searchUrl, const std::string& resultPattern, const std::string& resultOrder, const std::string& iconPath) :
+Search::Search(const std::string& name, 
+               const std::string& searchUrl, 
+               const std::string& resultPattern, 
+               const std::string& farrCaption, 
+               const std::string& farrGroup, 
+               const std::string& farrPath, 
+               const std::string& farrIconPath) :
 	_name(name),
 	_searchUrl(searchUrl),
 	_resultPattern(resultPattern),
-	_iconPath(iconPath)
+    _farrCaption(farrCaption),
+    _farrGroup(farrGroup),
+    _farrPath(farrPath),
+	_farrIconPath(farrIconPath)
 {
 	util::String::tolower(_name);
-
-	initGroupIndices(resultOrder);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,17 +121,6 @@ bool Search::hasName(const std::string& name) const
 	util::String::tolower(temp);
 
 	return (_name == temp);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Search::initGroupIndices(const std::string& resultOrder)
-{
-	_groupIndices.assign(0);
-	for(std::string::size_type index = 0; index < resultOrder.length(); ++index)
-	{
-		_groupIndices[index] = util::String::fromString<int>(resultOrder.substr(index, 1));
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

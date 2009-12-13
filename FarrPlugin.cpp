@@ -4,7 +4,6 @@
 #include "Util.h"
 
 #include <sstream>
-#include <regex>
 
 #include <algorithm>
 #include <functional> 
@@ -83,10 +82,6 @@ void FarrPlugin::search(const char* rawSearchString)
 				{
 					const Search& search = *it;
 
-					const int captionIndex = search.getGroupIndex(Search::Caption);
-					const int descriptionIndex = search.getGroupIndex(Search::Description);
-					const int urlIndex = search.getGroupIndex(Search::Url);
-
 					setStatusText("searching...");
 
 					DWORD start = GetTickCount();
@@ -105,12 +100,11 @@ void FarrPlugin::search(const char* rawSearchString)
 					for( ; it != end; ++it)
 					{
 						const std::tr1::cmatch match = *it;
-						const std::string heading = replaceNcrs(match[captionIndex]);
-						const std::string group = replaceNcrs(match[descriptionIndex]);
-						const std::string link = replaceNcrs(match[urlIndex]);
-						const std::string url = fixLink(link, search.getSearchUrl());
+                        const std::string caption = replaceSubexpressions(search.getFarrCaption(), match);
+                        const std::string group = replaceSubexpressions(search.getFarrGroup(), match);
+                        const std::string url = replaceSubexpressions(search.getFarrPath(), match); //replaceNcrs(match[urlIndex]);
 
-						_farrItems.push_back(FarrItem(heading, group, removeHttp(url), search.getIconPath()));
+						_farrItems.push_back(FarrItem(caption, group, removeHttp(url), search.getFarrIconPath()));
 					}
 
 					DWORD delta = GetTickCount() - start;
@@ -137,7 +131,7 @@ void FarrPlugin::listSearches()
 
 void FarrPlugin::addSearchToResults(const Search& search)
 {
-	_farrItems.push_back(FarrItem(search.getName(), "", _farrAlias + " " + search.getName(), search.getIconPath()));
+	_farrItems.push_back(FarrItem(search.getName(), "", _farrAlias + " " + search.getName(), search.getFarrIconPath()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,23 +194,40 @@ std::string FarrPlugin::removeHttp(const std::string& url)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-std::string FarrPlugin::fixLink(const std::string& link, const std::string& searchUrl)
+std::string FarrPlugin::replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match)
 {
-	if(!link.empty() && link[0] == '/')
-	{
-		// relative path. add domain.
-		if(searchUrl.find("http://") == 0)
-		{
-			const std::string::size_type pos = searchUrl.find('/', 7); // start after http://
-			if(pos != std::string::npos)
-			{
-				return searchUrl.substr(0, pos) + link;
-			}
-		}
-	}
+    std::string temp(text);
 
-	return link;
+    const std::tr1::cmatch::size_type maxSubexpression = match.size();
+    for(std::tr1::cmatch::size_type index = 1; index <= maxSubexpression; ++index)
+    {
+        std::stringstream stream;
+        stream << "\\$" << index;
+        temp = std::tr1::regex_replace(temp, std::tr1::regex(stream.str()), match[index].str());
+    }
+
+    return replaceNcrs(temp);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+//std::string FarrPlugin::fixLink(const std::string& link, const std::string& searchUrl)
+//{
+//	if(!link.empty() && link[0] == '/')
+//	{
+//		// relative path. add domain.
+//		if(searchUrl.find("http://") == 0)
+//		{
+//			const std::string::size_type pos = searchUrl.find('/', 7); // start after http://
+//			if(pos != std::string::npos)
+//			{
+//				return searchUrl.substr(0, pos) + link;
+//			}
+//		}
+//	}
+//
+//	return link;
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 
