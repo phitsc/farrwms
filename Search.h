@@ -4,43 +4,38 @@
 
 #include <vector>
 #include <string>
-#include <array>
 
 ///////////////////////////////////////////////////////////////////////////////
 
 class Search
 {
 public:
-	Search(const std::string& name, const std::string& searchUrl, const std::string& resultPattern, const std::string& resultOrder, const std::string& iconPath);
+	Search(const std::string& name, 
+           const std::string& searchUrl, 
+           const std::string& resultPattern, 
+           const std::string& farrCaption, 
+           const std::string& farrGroup, 
+           const std::string& farrPath, 
+           const std::string& farrIconPath);
 
 	bool hasName(const std::string& name) const;
 
 	const std::string& getName() const { return _name; }
 	const std::string& getSearchUrl() const { return _searchUrl; }
 	const std::string& getResultPattern() const { return _resultPattern; }
-	const std::string& getIconPath() const { return _iconPath; }
-
-	enum Group
-	{
-		Caption,
-		Description,
-		Url,
-
-		GroupCount
-	};
-
-	int getGroupIndex(Group group) const { return _groupIndices[group]; }
+	const std::string& getFarrCaption() const { return _farrCaption; }
+	const std::string& getFarrGroup() const { return _farrGroup; }
+	const std::string& getFarrPath() const { return _farrPath; }
+	const std::string& getFarrIconPath() const { return _farrIconPath; }
 
 private:
 	std::string _name;
 	std::string _searchUrl;
 	std::string _resultPattern;
-	std::string _iconPath;
-
-	typedef std::tr1::array<int, GroupCount> GroupIndices;
-	GroupIndices _groupIndices;
-
-	void initGroupIndices(const std::string& resultOrder);
+	std::string _farrCaption;
+	std::string _farrGroup;
+	std::string _farrPath;
+	std::string _farrIconPath;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
