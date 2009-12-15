@@ -10,7 +10,8 @@
 class Search
 {
 public:
-	Search(const std::string& name, 
+	Search(const std::string& name,
+           const std::string& description,
            const std::string& searchUrl, 
            const std::string& resultPattern, 
            const std::string& farrCaption, 
@@ -21,6 +22,7 @@ public:
 	bool hasName(const std::string& name) const;
 
 	const std::string& getName() const { return _name; }
+    const std::string& getDescription() const { return _description; }
 	const std::string& getSearchUrl() const { return _searchUrl; }
 	const std::string& getResultPattern() const { return _resultPattern; }
 	const std::string& getFarrCaption() const { return _farrCaption; }
@@ -30,6 +32,7 @@ public:
 
 private:
 	std::string _name;
+    std::string _description;
 	std::string _searchUrl;
 	std::string _resultPattern;
 	std::string _farrCaption;

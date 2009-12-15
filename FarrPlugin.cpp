@@ -162,7 +162,7 @@ void FarrPlugin::listSearches()
 
 void FarrPlugin::addSearchToResults(const Search& search)
 {
-	_farrItems.push_back(FarrItem(search.getName(), "", _farrAlias + " " + search.getName(), search.getFarrIconPath()));
+    _farrItems.push_back(FarrItem(search.getName(), search.getDescription(), _farrAlias + search.getName(), search.getFarrIconPath()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
