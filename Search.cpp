@@ -45,7 +45,8 @@ void Searches::addSearch(const std::string& searchFile)
 			const std::string searchName = PathFindFileName(searchFileName);
 			const std::string iconPath = findIconPath(searchFile);
 
-			_searches.push_back(Search(searchName, 
+			_searches.push_back(Search(searchName,
+                                       static_cast<const char*>(searchNode->selectSingleNode("description")->text),
 									   static_cast<const char*>(searchNode->selectSingleNode("searchUrl")->text), 
 									   static_cast<const char*>(searchNode->selectSingleNode("resultPattern")->text), 
 									   static_cast<const char*>(searchNode->selectSingleNode("farrCaption")->text),
@@ -95,7 +96,8 @@ std::string Searches::findIconPath(const std::string& searchFile)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-Search::Search(const std::string& name, 
+Search::Search(const std::string& name,
+               const std::string& description,
                const std::string& searchUrl, 
                const std::string& resultPattern, 
                const std::string& farrCaption, 
@@ -103,6 +105,7 @@ Search::Search(const std::string& name,
                const std::string& farrPath, 
                const std::string& farrIconPath) :
 	_name(name),
+    _description(description),
 	_searchUrl(searchUrl),
 	_resultPattern(resultPattern),
     _farrCaption(farrCaption),
