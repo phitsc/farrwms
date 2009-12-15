@@ -3,6 +3,8 @@
 #include "FarrItem.h"
 #include "Search.h"
 #include "msxml.h"
+#include "XmlHttpEventSink.h"
+#include "XmlHttpRequestEvents.h"
 
 #include <string>
 #include <regex>
@@ -10,13 +12,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class FarrPlugin
+class FarrPlugin :
+    private XmlHttpRequestEvents
 {
 public:
     FarrPlugin(const std::string& modulePath);
     ~FarrPlugin();
 
     void search(const char* rawSearchString);
+    void stopSearch();
+    bool isSearching() const;
 
     FarrItems::size_type getItemCount() const;
     const FarrItem& getItem(const FarrItems::size_type& index) const;
@@ -27,7 +32,14 @@ private:
 	void listSearches();
 	void addSearchToResults(const Search& search);
 
+    const Search* _currentSearch;
+    bool _isSearching;
+
     MSXML2::IXMLHTTPRequestPtr _xmlHttpRequest;
+    XmlHttpEventSink* _xmlHttpEventSink;
+
+    // XmlHttpRequestEvents
+    virtual void onHttpRequestResponse(const std::string& response);
 
     //
     std::string _farrAlias;
@@ -40,6 +52,8 @@ private:
     void clearResults();
 
     // some helper functions
+    void signalSearchStateChanged(bool isSearching, FarrItems::size_type itemCount = 0);
+
     static std::string replaceNcrs(const std::string& text);
     static std::string removeHttp(const std::string& url);
     static std::string replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match);

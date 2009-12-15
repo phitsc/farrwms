@@ -192,6 +192,10 @@
 				RelativePath=".\Util.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\XmlHttpEventSink.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -223,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Lock.h"
+				>
+			</File>
+			<File
 				RelativePath=".\msxml.h"
 				>
 			</File>
@@ -232,6 +240,14 @@
 			</File>
 			<File
 				RelativePath=".\Util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XmlHttpEventSink.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XmlHttpRequestEvents.h"
 				>
 			</File>
 		</Filter>
