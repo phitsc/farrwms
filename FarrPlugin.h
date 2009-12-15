@@ -29,8 +29,8 @@ public:
 private:
 	Searches _searches;
 
-	void listSearches();
-	void addSearchToResults(const Search& search);
+    void listSearches(const std::string& filter);
+    void addSearchToResults(const Search& search, const std::string& filter);
 
     const Search* _currentSearch;
     bool _isSearching;

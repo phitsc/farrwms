@@ -194,14 +194,7 @@ bool String::containsSubstringNoCase(const std::string& value, const std::string
     std::string substringLower(substring);
     tolower(substringLower);
 
-    if(valueLower.find(substringLower) != std::string::npos)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (valueLower.find(substringLower) != std::string::npos);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

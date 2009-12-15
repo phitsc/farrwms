@@ -64,49 +64,42 @@ void FarrPlugin::search(const char* rawSearchString)
 
     signalSearchStateChanged(true);
 
+    clearResults();
+
     //
     std::string searchString(rawSearchString);
     // remove rmilk alias
     searchString.erase(0, _farrAlias.length());
 
-    if(searchString.empty())
+	const std::string::size_type pos = searchString.find(' ');
+	if(pos != std::string::npos)
 	{
-		listSearches();
+		const std::string searchName = searchString.substr(0, pos);
+		const std::string searchTerm = searchString.substr(pos + 1);
 
-        signalSearchStateChanged(false, getItemCount());
-	}
-	else
-    {
-        clearResults();
-
-		const std::string::size_type pos = searchString.find(' ');
-		if(pos != std::string::npos)
+		if(!searchTerm.empty())
 		{
-			const std::string searchName = searchString.substr(0, pos);
-			const std::string searchTerm = searchString.substr(pos + 1);
-
-			if(!searchTerm.empty())
+			Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
+			if(it != _searches.end())
 			{
-				Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
-				if(it != _searches.end())
-				{
-					_currentSearch = &(*it);
+				_currentSearch = &(*it);
 
-					setStatusText("searching...");
+				const std::string searchUrl = _currentSearch->getSearchUrl() + searchTerm;
 
-					const std::string searchUrl = _currentSearch->getSearchUrl() + searchTerm;
+				_xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
+                _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
+				_xmlHttpRequest->send();
 
-					_xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
-                    _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
-					_xmlHttpRequest->send();
-
-                    return;
-				}
+                return; // searching continues
 			}
 		}
-
-        signalSearchStateChanged(false);
 	}
+    else
+    {
+        listSearches(searchString);
+    }
+
+    signalSearchStateChanged(false, getItemCount());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,18 +144,21 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FarrPlugin::listSearches()
+void FarrPlugin::listSearches(const std::string& filter)
 {
-	clearResults();
-
-	std::for_each(_searches.begin(), _searches.end(), std::tr1::bind(&FarrPlugin::addSearchToResults, this, _1));
+	std::for_each(_searches.begin(), _searches.end(), std::tr1::bind(&FarrPlugin::addSearchToResults, this, _1, filter));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FarrPlugin::addSearchToResults(const Search& search)
+void FarrPlugin::addSearchToResults(const Search& search, const std::string& filter)
 {
-    _farrItems.push_back(FarrItem(search.getName(), search.getDescription(), _farrAlias + search.getName(), search.getFarrIconPath()));
+    const std::string& searchName = search.getName();
+
+    if(filter.empty() || util::String::containsSubstringNoCase(searchName, filter))
+    {
+        _farrItems.push_back(FarrItem(searchName, search.getDescription(), _farrAlias + search.getName(), search.getFarrIconPath()));
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
