@@ -1,8 +1,8 @@
 <search>
 	<description>Internet Movie Database</description>
 	<searchUrl>http://www.imdb.com/find?s=all&amp;q=</searchUrl>
-	<resultPattern>&lt;a href=&quot;/title/(.*)&quot; onclick=&quot;.*&quot;&gt;(.*)&lt;/a&gt;(.*)&lt;br&gt;</resultPattern>
+	<resultPattern>&lt;a href=&quot;/title/([\w]*/)&quot; onclick=&quot;\(new Image\(\)\).src='[\w\?\./\-\=]*';&quot;&gt;([^&lt;]*)&lt;/a&gt;</resultPattern>
 	<farrCaption>$2</farrCaption>
-	<farrGroup>$3</farrGroup>
+	<farrGroup>no</farrGroup>
 	<farrPath>http://www.imdb.com/title/$1</farrPath>
 </search>
