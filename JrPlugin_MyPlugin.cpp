@@ -34,10 +34,6 @@
 
 //-----------------------------------------------------------------------
 // global state info
-E_SearchStateT current_searchstate = E_SearchState_Stopped;
-E_ResultAvailableStateT resultsavailabletype = E_ResultAvailableState_None;
-int numresultsavailable = 0;
-BOOL current_lockstate = FALSE;
 bool isready = true;
 //
 //
@@ -352,15 +348,7 @@ PREFUNCDEF BOOL EFuncName_Inform_RegexSearchMatchV2(const char* searchstring_raw
 //
 PREFUNCDEF void EFuncName_Inform_SearchEnds()
 {
-    // stop search and set this
-    current_searchstate = E_SearchState_Stopped;
-
-    // ATTN: test clear results
-    numresultsavailable = 0;
-    resultsavailabletype = E_ResultAvailableState_None;
-
-    // notify host that our state has changed
-    ExecuteCallback_SearchStateChanged();
+    farrPlugin->stopSearch();
 }
 //-----------------------------------------------------------------------
 
@@ -432,8 +420,7 @@ PREFUNCDEF BOOL EFuncName_Ask_WantFeature(E_WantFeaturesT featureid)
 //
 PREFUNCDEF E_SearchStateT EFuncName_Ask_SearchState()
 {
-    // this will be tracked elsewhere
-    return current_searchstate;
+    return farrPlugin->isSearching() ? E_SearchState_Searching : E_SearchState_Stopped;
 }
 //-----------------------------------------------------------------------
 
@@ -446,16 +433,14 @@ PREFUNCDEF E_SearchStateT EFuncName_Ask_SearchState()
 //
 PREFUNCDEF E_ResultAvailableStateT EFuncName_Ask_IsAnyResultAvailable()
 {
-    // this will be tracked elsewhere
-    return resultsavailabletype;
+    return (farrPlugin->getItemCount() > 0) ? E_ResultAvailableState_ItemResuls : E_ResultAvailableState_None;
 }
 
 
 // Host wants to know how many item results are available
 PREFUNCDEF int EFuncName_Ask_HowManyItemResultsAreReady()
 {
-    // this will be tracked elsewhere
-    return numresultsavailable;
+    return farrPlugin->getItemCount();
 }
 //-----------------------------------------------------------------------
 
@@ -473,16 +458,9 @@ PREFUNCDEF int EFuncName_Ask_HowManyItemResultsAreReady()
 //
 PREFUNCDEF BOOL EFuncName_Request_LockResults(BOOL dolock)
 {
-    // set lock
-    current_lockstate = dolock;
-
-    if(dolock == false)
+    if(dolock == FALSE)
     {
-        // on unlocking they have retrieved all the results, so CLEAR the results or they will be found again
-        numresultsavailable = 0;
-        resultsavailabletype = E_ResultAvailableState_None;
-        // notify host that our state has changed
-        ExecuteCallback_SearchStateChanged();
+        farrPlugin->stopSearch();
     }
 
     // success
@@ -635,17 +613,6 @@ PREFUNCDEF BOOL EFuncName_Do_AdjustResultScore(const char* /*itempath*/, int* /*
 
 //-----------------------------------------------------------------------
 
-void ExecuteCallback_SearchStateChanged()
-{
-    // tell the host that our state or resultcount has changed
-    if(callbackfp_notifysearchstatechanged)
-    {
-        callbackfp_notifysearchstatechanged(hostptr, numresultsavailable, current_searchstate);
-    }
-}
-
-//-----------------------------------------------------------------------
-
 BOOL DoFarrSearchBegin(const char* searchstring_raw, const char* /*searchstring_lc_nokeywords*/)
 {
     // FARR search -- all we really do is return all bookmarks in our store, and let the farr program filter them based on what user types
@@ -658,24 +625,7 @@ BOOL DoFarrSearchBegin(const char* searchstring_raw, const char* /*searchstring_
         return FALSE;
     }
 
-    // start and end of search state
-    current_searchstate = E_SearchState_Searching;
-
-    ExecuteCallback_SearchStateChanged();
-
-    //
     farrPlugin->search(searchstring_raw);
-
-    // ok now results are available right away
-    // IMPORTANT: here is where you modify the code to specify how many results are available
-    numresultsavailable = (int)farrPlugin->getItemCount();
-    resultsavailabletype = E_ResultAvailableState_ItemResuls;
-
-    // done
-    current_searchstate = E_SearchState_Stopped;
-
-    // notify host that our state has changed
-    ExecuteCallback_SearchStateChanged();
 
     // search can continue by others
     return FALSE;

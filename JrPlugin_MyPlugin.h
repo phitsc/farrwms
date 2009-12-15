@@ -109,7 +109,6 @@
 // external globals defined in the .cpp
 extern E_SearchStateT current_searchstate;
 extern E_ResultAvailableStateT resultsavailabletype;
-extern int numresultsavailable;
 extern BOOL current_lockstate;
 extern bool isready;
 //-----------------------------------------------------------------------
@@ -123,7 +122,6 @@ extern Fp_GlobalPluginCallback_NotifySearchStateChanged callbackfp_notifysearchs
 
 //-----------------------------------------------------------------------
 // Forward declarations
-void ExecuteCallback_SearchStateChanged();
 BOOL DoFarrSearchBegin(const char* searchstring_raw, const char *searchstring_lc_nokeywords);
 //-----------------------------------------------------------------------
 
