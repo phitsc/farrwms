@@ -54,7 +54,7 @@ private:
     // some helper functions
     void signalSearchStateChanged(bool isSearching, FarrItems::size_type itemCount = 0);
 
-    static std::string replaceNcrs(const std::string& text);
+    static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
     static std::string replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match);
 	//static std::string fixLink(const std::string& link, const std::string& searchUrl);

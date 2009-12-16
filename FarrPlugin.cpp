@@ -182,10 +182,11 @@ extern HINSTANCE dllInstanceHandle;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-std::string FarrPlugin::replaceNcrs(const std::string& text)
+std::string FarrPlugin::replaceCharacterEntityReferences(const std::string& text)
 {
     std::string temp(text);
 
+    // the numeric ones
 	std::string::size_type pos = temp.find("&#");
 	while(pos != std::string::npos)
 	{
@@ -204,6 +205,13 @@ std::string FarrPlugin::replaceNcrs(const std::string& text)
 
 		pos = temp.find("&#", pos + 1);
 	}
+
+    // the special ones
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&quot;"), std::string("\""));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&amp;"), std::string("&"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&apos;"), std::string("'"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&lt;"), std::string("<"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&gt;"), std::string(">"));
 
     return temp;
 }
@@ -233,7 +241,7 @@ std::string FarrPlugin::replaceSubexpressions(const std::string& text, const std
         temp = std::tr1::regex_replace(temp, std::tr1::regex(stream.str()), match[index].str());
     }
 
-    return replaceNcrs(temp);
+    return replaceCharacterEntityReferences(temp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
