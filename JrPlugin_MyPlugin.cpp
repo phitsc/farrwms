@@ -549,7 +549,7 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const c
         info.lpFile = url.c_str();
         ShellExecuteEx(&info);
 
-        *closeafterp = FALSE;
+        *closeafterp = TRUE;
 
         return TRUE;
     }
