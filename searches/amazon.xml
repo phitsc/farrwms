@@ -1,0 +1,8 @@
+<search>
+	<description>Amazon</description>
+	<searchUrl>http://www.amazon.com/s/ref=nb_ss?url=search-alias%3Daps&amp;field-keywords=</searchUrl>
+	<resultPattern>&lt;div class=&quot;productImage&quot;&gt;&lt;a href=&quot;[\w:/\.\-\?=\&amp;]*&quot;&gt;\s*&lt;img[\w\s=&quot;\('\)\{\};]*src=&quot;([\w:/\.\-]*)&quot;[\w\s=&quot;/]*&gt;\s*&lt;/a&gt;&lt;/div&gt;\s*&lt;div class=&quot;productData&quot;&gt;\s*&lt;div class=&quot;productTitle&quot;&gt;&lt;a href=&quot;([\w:/\.\-\=\?\&amp;]*)&quot;&gt;([\s\w\(\&amp;;,\)\.]*)&lt;/a&gt;\s*&lt;span class=&quot;ptBrand&quot;&gt;([\w\s]*)&lt;/span&gt;&lt;span class=&quot;binding&quot;&gt;([\(,\)\w\s]*)&lt;/span&gt;&lt;/div&gt;</resultPattern>
+	<farrCaption>$3</farrCaption>
+	<farrGroup>$4$5</farrGroup>
+	<farrPath>$2</farrPath>
+</search>
