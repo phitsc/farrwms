@@ -1,8 +1,0 @@
-<search>
-	<description>Microsoft Developer Network</description>
-	<searchUrl>http://social.msdn.microsoft.com/Search/en-GB?query=</searchUrl>
-	<resultPattern>&lt;a onmousedown=\&quot;.*\&quot; href=\&quot;.*\&quot;&gt;(.*)&lt;/a&gt;\r\n&lt;br/&gt;\r\n&lt;div class=\&quot;ResultDescription\&quot;&gt;(.*)&lt;/div&gt;\r\n&lt;div class=\&quot;ResultUrl\&quot;&gt;(.*)&lt;/div&gt;</resultPattern>
-	<farrCaption>$1</farrCaption>
-	<farrGroup>$2</farrGroup>
-	<farrPath>$3</farrPath>
-</search>

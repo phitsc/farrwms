@@ -1,8 +1,0 @@
-<search>
-	<description>Compact Disc Database (Gracenote)</description>
-	<searchUrl>http://www.gracenote.com/search/?query=</searchUrl>
-	<resultPattern>&lt;div class=&quot;album-meta-data-wrapper&quot;&gt;\n.*&lt;a href=&quot;(.*)&quot;&gt;(.*)&lt;/a&gt;.*\n.*&lt;a href=&quot;.*&quot;&gt;(.*)&lt;/a&gt;</resultPattern>
-	<farrCaption>$2</farrCaption>
-	<farrGroup>$3</farrGroup>
-	<farrPath>http://www.gracenote.com$1</farrPath>
-</search>
