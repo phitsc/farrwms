@@ -12,7 +12,7 @@ using namespace std::tr1::placeholders;
 
 Searches::Searches(const std::string& searchesDirectory)
 {
-	util::FileList searchesFiles(searchesDirectory, "*.ini", util::FileList::Files);
+	util::FileList searchesFiles(searchesDirectory, "*.conf", util::FileList::Files);
 
 	std::for_each(searchesFiles.begin(), searchesFiles.end(), std::tr1::bind(&Searches::addSearch, this, _1));
 }
