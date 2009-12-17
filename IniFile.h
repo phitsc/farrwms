@@ -79,10 +79,10 @@ private:
     {
         std::ifstream stream(_file);
 
-        const int MAX_LINE_LENGTH = 512;
+        const int MAX_LINE_LENGTH = 4096;
         char lineBuffer[MAX_LINE_LENGTH];
 
-        while(!stream.eof())
+        while(!stream.eof() && !stream.fail())
         {
             stream.getline(lineBuffer, MAX_LINE_LENGTH);
             std::string line = lineBuffer;
