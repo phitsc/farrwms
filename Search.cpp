@@ -42,8 +42,9 @@ void Searches::addSearch(const std::string& searchFile)
 									   iconPath));
 		}
     }
-    catch(IniParameterNotFoundException&)
+    catch(IniParameterNotFoundException& e)
     {
+        OutputDebugString(e.what());
     }
 }
 
