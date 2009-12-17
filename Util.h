@@ -36,7 +36,23 @@ struct String
     template<typename Type>
     static Type fromString(const std::string& valueAsString)
     {
-        std::stringstream stream(valueAsString);
+        if(valueAsString.empty())
+        {
+            // should throw
+            return Type();
+        }
+
+        std::stringstream stream;
+
+        if(valueAsString[0] == 'x')
+        {
+            stream << std::hex << valueAsString.substr(1);
+        }
+        else
+        {
+            stream << valueAsString;
+        }
+
         Type value;
         stream >> value;
 
