@@ -1,7 +1,5 @@
 #pragma once
 
-#include "msxml.h"
-
 #include <vector>
 #include <string>
 
@@ -50,7 +48,6 @@ public:
 	typedef SearchCollection::const_iterator const_iterator;
 
 	Searches(const std::string& searchesDirectory);
-	~Searches();
 
 	const_iterator begin() const { return _searches.begin(); }
 	const_iterator end() const { return _searches.end(); }
@@ -61,8 +58,6 @@ private:
 
 	typedef std::vector<Search> SearchCollection;
 	SearchCollection _searches;
-
-	MSXML2::IXMLDOMDocument2Ptr _document;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

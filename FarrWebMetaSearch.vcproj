@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IniFile.h"
+				>
+			</File>
+			<File
 				RelativePath=".\JrPlugin_GenericShell.h"
 				>
 			</File>
