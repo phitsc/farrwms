@@ -7,11 +7,16 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <sstream>
+#include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct IniParameterNotFoundException
+struct IniParameterNotFoundException : std::invalid_argument
 {
+    IniParameterNotFoundException(const std::string& message) :
+      std::invalid_argument(message)
+    {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,12 +26,18 @@ class IniFile
     typedef std::map<std::string, std::string> Parameters;
 
 public:
-    IniFile(const std::string& path)
+    IniFile(const std::string& path) :
+      _path(path)
     {
 		 errno_t ret = fopen_s(&_file, path.c_str(), "r");
 		 if(ret != 0)
 		 {
-			 _file = 0;
+             _file = 0;
+
+             std::stringstream stream;
+             stream << "Loading '" << path << "' failed.\n";
+
+             OutputDebugString(stream.str().c_str());
 		 }
          else
          {
@@ -56,7 +67,10 @@ public:
         }
         else
         {
-            throw IniParameterNotFoundException();
+            std::stringstream stream;
+            stream << "Parameter '" << parameterName << "' in '" << _path << "' not found.\n";
+
+            throw IniParameterNotFoundException(stream.str());
         }
     }
 
@@ -94,6 +108,9 @@ private:
 
 	FILE* _file;
     Parameters _parameters;
+    const std::string _path;
+
+    void operator=(const IniFile&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
