@@ -32,14 +32,18 @@ void Searches::addSearch(const std::string& searchFile)
 			const std::string searchName = PathFindFileName(searchFileName);
 			const std::string iconPath = findIconPath(searchFile);
 
-			_searches.push_back(Search(searchName,
-                                       iniFile.getParameterValue("description"),
-									   iniFile.getParameterValue("searchUrl"), 
-									   iniFile.getParameterValue("resultPattern"), 
-									   iniFile.getParameterValue("farrCaption"),
-									   iniFile.getParameterValue("farrGroup"),
-									   iniFile.getParameterValue("farrPath"),
-									   iconPath));
+			Search search(searchName);
+
+            search.addItem("", 
+                           iniFile.getParameterValue("", "description"),
+						   iniFile.getParameterValue("", "searchUrl"), 
+						   iniFile.getParameterValue("", "resultPattern"), 
+						   iniFile.getParameterValue("", "farrCaption"),
+						   iniFile.getParameterValue("", "farrGroup"),
+						   iniFile.getParameterValue("", "farrPath"),
+						   iconPath);
+
+            _searches.push_back(search);
 		}
     }
     catch(IniParameterNotFoundException& e)
@@ -67,24 +71,30 @@ std::string Searches::findIconPath(const std::string& searchFile)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-Search::Search(const std::string& name,
-               const std::string& description,
-               const std::string& searchUrl, 
-               const std::string& resultPattern, 
-               const std::string& farrCaption, 
-               const std::string& farrGroup, 
-               const std::string& farrPath, 
-               const std::string& farrIconPath) :
-	_name(name),
-    _description(description),
-	_searchUrl(searchUrl),
-	_resultPattern(resultPattern),
-    _farrCaption(farrCaption),
-    _farrGroup(farrGroup),
-    _farrPath(farrPath),
-	_farrIconPath(farrIconPath)
+Search::Search(const std::string& name) :
+	_name(name)
 {
 	util::String::tolower(_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Search::addItem(const std::string& optionName,
+                     const std::string& description,
+                     const std::string& searchUrl, 
+                     const std::string& resultPattern, 
+                     const std::string& farrCaption, 
+                     const std::string& farrGroup, 
+                    const std::string& farrPath, 
+                    const std::string& farrIconPath)
+{
+    _descriptions[optionName] = description;
+	_searchUrls[optionName] = searchUrl;
+	_resultPatterns[optionName] = resultPattern;
+    _farrCaptions[optionName] = farrCaption;
+    _farrGroups[optionName] = farrGroup;
+    _farrPaths[optionName] = farrPath;
+	_farrIconPaths[optionName] = farrIconPath;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
