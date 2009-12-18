@@ -2,41 +2,61 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 ///////////////////////////////////////////////////////////////////////////////
 
 class Search
 {
 public:
-	Search(const std::string& name,
-           const std::string& description,
-           const std::string& searchUrl, 
-           const std::string& resultPattern, 
-           const std::string& farrCaption, 
-           const std::string& farrGroup, 
-           const std::string& farrPath, 
-           const std::string& farrIconPath);
+	Search(const std::string& name);
+
+    void addItem(const std::string& optionName,
+                 const std::string& description,
+                 const std::string& searchUrl, 
+                 const std::string& resultPattern, 
+                 const std::string& farrCaption, 
+                 const std::string& farrGroup, 
+                 const std::string& farrPath, 
+                 const std::string& farrIconPath);
 
 	bool hasName(const std::string& name) const;
 
-	const std::string& getName() const { return _name; }
-    const std::string& getDescription() const { return _description; }
-	const std::string& getSearchUrl() const { return _searchUrl; }
-	const std::string& getResultPattern() const { return _resultPattern; }
-	const std::string& getFarrCaption() const { return _farrCaption; }
-	const std::string& getFarrGroup() const { return _farrGroup; }
-	const std::string& getFarrPath() const { return _farrPath; }
-	const std::string& getFarrIconPath() const { return _farrIconPath; }
+    const std::string& getName() const { return _name; }
+
+    const std::string& getDescription(const std::string& optionName) const { return getItem(optionName, _descriptions); }
+	const std::string& getSearchUrl(const std::string& optionName) const { return getItem(optionName, _searchUrls); }
+	const std::string& getResultPattern(const std::string& optionName) const { return getItem(optionName, _resultPatterns); }
+	const std::string& getFarrCaption(const std::string& optionName) const { return getItem(optionName, _farrCaptions); }
+	const std::string& getFarrGroup(const std::string& optionName) const { return getItem(optionName, _farrGroups); }
+	const std::string& getFarrPath(const std::string& optionName) const { return getItem(optionName, _farrPaths); }
+	const std::string& getFarrIconPath(const std::string& optionName) const { return getItem(optionName, _farrIconPaths); }
 
 private:
-	std::string _name;
-    std::string _description;
-	std::string _searchUrl;
-	std::string _resultPattern;
-	std::string _farrCaption;
-	std::string _farrGroup;
-	std::string _farrPath;
-	std::string _farrIconPath;
+    typedef std::map<std::string, std::string> Strings;
+
+    const std::string& getItem(const std::string& optionName, const Strings& collection) const
+    {
+        const Strings::const_iterator it = collection.find(optionName);
+        if(it != collection.end())
+        {
+            return it->second;
+        }
+        else
+        {
+            static std::string empty;
+            return empty;
+        }
+    }
+
+    std::string _name;
+    Strings _descriptions;
+	Strings _searchUrls;
+	Strings _resultPatterns;
+	Strings _farrCaptions;
+	Strings _farrGroups;
+	Strings _farrPaths;
+	Strings _farrIconPaths;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

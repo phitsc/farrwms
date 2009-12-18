@@ -84,7 +84,7 @@ void FarrPlugin::search(const char* rawSearchString)
 			{
 				_currentSearch = &(*it);
 
-				const std::string searchUrl = _currentSearch->getSearchUrl() + searchTerm;
+				const std::string searchUrl = _currentSearch->getSearchUrl("") + searchTerm;
 
 				_xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                 _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
@@ -125,18 +125,18 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 {
     clearResults();
 
-    const std::tr1::cregex_iterator::regex_type regexType(_currentSearch->getResultPattern());
+    const std::tr1::cregex_iterator::regex_type regexType(_currentSearch->getResultPattern(""));
 
     std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
     std::tr1::cregex_iterator end;
     for( ; it != end; ++it)
     {
         const std::tr1::cmatch match = *it;
-        const std::string caption = replaceSubexpressions(_currentSearch->getFarrCaption(), match);
-        const std::string group = replaceSubexpressions(_currentSearch->getFarrGroup(), match);
-        const std::string url = replaceSubexpressions(_currentSearch->getFarrPath(), match);
+        const std::string caption = replaceSubexpressions(_currentSearch->getFarrCaption(""), match);
+        const std::string group = replaceSubexpressions(_currentSearch->getFarrGroup(""), match);
+        const std::string url = replaceSubexpressions(_currentSearch->getFarrPath(""), match);
 
-        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath()));
+        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath("")));
     }
 
     signalSearchStateChanged(false, getItemCount());
@@ -157,7 +157,7 @@ void FarrPlugin::addSearchToResults(const Search& search, const std::string& fil
 
     if(filter.empty() || util::String::containsSubstringNoCase(searchName, filter))
     {
-        _farrItems.push_back(FarrItem(searchName, search.getDescription(), _farrAlias + search.getName(), search.getFarrIconPath()));
+        _farrItems.push_back(FarrItem(searchName, search.getDescription(""), _farrAlias + search.getName(), search.getFarrIconPath("")));
     }
 }
 

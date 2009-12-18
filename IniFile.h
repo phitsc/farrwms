@@ -24,6 +24,7 @@ struct IniParameterNotFoundException : std::invalid_argument
 class IniFile
 {
     typedef std::map<std::string, std::string> Parameters;
+    typedef std::map<std::string, Parameters> ParametersCollection;
 
 public:
     IniFile(const std::string& path) :
@@ -58,20 +59,23 @@ public:
         return (_file != 0);
     }
 
-    const std::string& getParameterValue(const std::string& parameterName) const // throws IniParameterNotFoundException
+    const std::string& getParameterValue(const std::string& sectionName, const std::string& parameterName) const // throws IniParameterNotFoundException
     {
-        const Parameters::const_iterator it = _parameters.find(parameterName);
-        if(it != _parameters.end())
+        ParametersCollection::const_iterator it1 = _parametersCollection.find(sectionName);
+        if(it1 != _parametersCollection.end())
         {
-            return it->second;
+            const Parameters& parameters = it1->second;
+            const Parameters::const_iterator it2 = parameters.find(parameterName);
+            if(it2 != parameters.end())
+            {
+                return it2->second;
+            }
         }
-        else
-        {
-            std::stringstream stream;
-            stream << "Parameter '" << parameterName << "' in '" << _path << "' not found.\n";
 
-            throw IniParameterNotFoundException(stream.str());
-        }
+        std::stringstream stream;
+        stream << "Parameter '" << parameterName << "' in section '" << sectionName << " in '" << _path << "' not found.\n";
+
+        throw IniParameterNotFoundException(stream.str());
     }
 
 private:
@@ -81,6 +85,8 @@ private:
 
         const int MAX_LINE_LENGTH = 4096;
         char lineBuffer[MAX_LINE_LENGTH];
+
+        std::string sectionName;
 
         while(!stream.eof() && !stream.fail())
         {
@@ -93,6 +99,13 @@ private:
                 {
                     continue;
                 }
+                else if(line[0] == '[')
+                {
+                    const std::string::size_type pos = line.find(']', 1);
+                    sectionName = line.substr(1, (pos != std::string::npos) ? (pos - 1) : std::string::npos);
+
+                    continue;
+                }
 
                 const std::string::size_type pos = line.find('=');
                 if(pos != std::string::npos)
@@ -100,14 +113,14 @@ private:
                     const std::string parameterName = line.substr(0, pos);
                     const std::string parameterValue = line.substr(pos + 1);
 
-                    _parameters.insert(std::make_pair(parameterName, parameterValue));
+                    _parametersCollection[sectionName].insert(std::make_pair(parameterName, parameterValue));
                 }
             }
         }
     }
 
 	FILE* _file;
-    Parameters _parameters;
+    ParametersCollection _parametersCollection;
     const std::string _path;
 
     void operator=(const IniFile&);
