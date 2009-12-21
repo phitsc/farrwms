@@ -79,6 +79,10 @@ void FarrPlugin::search(const char* rawSearchString)
 
 		if(!searchTerm.empty())
 		{
+            if(searchTerm.substr(0, 1).find_first_of("+/-") == 0)
+            {
+            }
+
 			Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
 			if(it != _searches.end())
 			{

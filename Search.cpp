@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <functional> 
+#include <regex>
 
 using namespace std::tr1::placeholders; 
 
@@ -34,14 +35,7 @@ void Searches::addSearch(const std::string& searchFile)
 
 			Search search(searchName);
 
-            search.addItem("", 
-                           iniFile.getParameterValue("", "description"),
-						   iniFile.getParameterValue("", "searchUrl"), 
-						   iniFile.getParameterValue("", "resultPattern"), 
-						   iniFile.getParameterValue("", "farrCaption"),
-						   iniFile.getParameterValue("", "farrGroup"),
-						   iniFile.getParameterValue("", "farrPath"),
-						   iconPath);
+            std::for_each(iniFile.sectionsBegin(), iniFile.sectionsEnd(), std::tr1::bind(&Searches::addItemToSearch, std::tr1::ref(search), std::tr1::ref(iniFile), _1, std::tr1::ref(iconPath)));
 
             _searches.push_back(search);
 		}
@@ -49,6 +43,31 @@ void Searches::addSearch(const std::string& searchFile)
     catch(IniParameterNotFoundException& e)
     {
         OutputDebugString(e.what());
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std::string& categoryName, const std::string& iconPath)
+{
+    char categoryIconPath[MAX_PATH];
+    PathAppend(categoryIconPath, iconPath.c_str());
+    PathRemoveExtension(categoryIconPath);
+    PathAppend(categoryIconPath, std::string("-" + categoryName).c_str());
+    PathAddExtension(categoryIconPath, ".ico");
+
+    const std::string pattern = iniFile.getParameterValue(categoryName, "resultPattern", "");
+
+    if(isValidRegularExpression(search.getName(), categoryName, pattern))
+    {
+        search.addItem(categoryName, 
+                       iniFile.getParameterValue(categoryName, "description", ""),
+                       iniFile.getParameterValue(categoryName, "searchUrl", ""), 
+                       pattern, 
+                       iniFile.getParameterValue(categoryName, "farrCaption", ""),
+                       iniFile.getParameterValue(categoryName, "farrGroup", ""),
+                       iniFile.getParameterValue(categoryName, "farrPath", ""),
+                       (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
     }
 }
 
@@ -69,6 +88,29 @@ std::string Searches::findIconPath(const std::string& searchFile)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+bool Searches::isValidRegularExpression(const std::string& searchName, const std::string& categoryName, const std::string& pattern)
+{
+    try 
+    { 
+        std::tr1::regex rx(pattern); 
+    } 
+    catch(const std::tr1::regex_error& e) 
+    { 
+        std::stringstream stream;
+        stream << searchName << " [" << categoryName << "]. Invalid Regular Expression. " << e.what() << "(" << e.code() << ")" << std::endl;
+
+        OutputDebugString(stream.str().c_str());
+
+        //std::tr1::regex_constants::error_paren
+
+        return false;
+    }
+
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 Search::Search(const std::string& name) :
@@ -85,8 +127,8 @@ void Search::addItem(const std::string& optionName,
                      const std::string& resultPattern, 
                      const std::string& farrCaption, 
                      const std::string& farrGroup, 
-                    const std::string& farrPath, 
-                    const std::string& farrIconPath)
+                     const std::string& farrPath, 
+                     const std::string& farrIconPath)
 {
     _descriptions[optionName] = description;
 	_searchUrls[optionName] = searchUrl;
