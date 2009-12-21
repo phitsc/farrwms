@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <map>
+#include <set>
 #include <string>
 #include <sstream>
 #include <stdexcept>
@@ -59,6 +60,11 @@ public:
         return (_file != 0);
     }
 
+    typedef std::set<std::string> SectionNames;
+    typedef SectionNames::const_iterator ConstSectionIterator;
+    ConstSectionIterator sectionsBegin() const { return _sectionNames.begin(); }
+    ConstSectionIterator sectionsEnd() const { return _sectionNames.end(); }
+
     const std::string& getParameterValue(const std::string& sectionName, const std::string& parameterName) const // throws IniParameterNotFoundException
     {
         ParametersCollection::const_iterator it1 = _parametersCollection.find(sectionName);
@@ -78,6 +84,22 @@ public:
         throw IniParameterNotFoundException(stream.str());
     }
 
+    const std::string& getParameterValue(const std::string& sectionName, const std::string& parameterName, const std::string& defaultValue) const
+    {
+        ParametersCollection::const_iterator it1 = _parametersCollection.find(sectionName);
+        if(it1 != _parametersCollection.end())
+        {
+            const Parameters& parameters = it1->second;
+            const Parameters::const_iterator it2 = parameters.find(parameterName);
+            if(it2 != parameters.end())
+            {
+                return it2->second;
+            }
+        }
+
+        return defaultValue;
+    }
+
 private:
     void parseIniFile()
     {
@@ -87,6 +109,7 @@ private:
         char lineBuffer[MAX_LINE_LENGTH];
 
         std::string sectionName;
+        _sectionNames.insert(sectionName);
 
         while(!stream.eof() && !stream.fail())
         {
@@ -103,6 +126,8 @@ private:
                 {
                     const std::string::size_type pos = line.find(']', 1);
                     sectionName = line.substr(1, (pos != std::string::npos) ? (pos - 1) : std::string::npos);
+                    util::String::tolower(sectionName);
+                    _sectionNames.insert(sectionName);
 
                     continue;
                 }
@@ -121,6 +146,7 @@ private:
 
 	FILE* _file;
     ParametersCollection _parametersCollection;
+    SectionNames _sectionNames;
     const std::string _path;
 
     void operator=(const IniFile&);

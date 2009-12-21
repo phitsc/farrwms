@@ -6,6 +6,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+class IniFile;
+
+///////////////////////////////////////////////////////////////////////////////
+
 class Search
 {
 public:
@@ -74,6 +78,8 @@ public:
 
 private:
 	void addSearch(const std::string& searchFile);
+    static void addItemToSearch(Search& search, const IniFile& iniFile, const std::string& categoryName, const std::string& iconPath);
+    static bool isValidRegularExpression(const std::string& searchName, const std::string& categoryName, const std::string& pattern);
 	static std::string findIconPath(const std::string& searchFile);
 
 	typedef std::vector<Search> SearchCollection;
