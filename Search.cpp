@@ -137,6 +137,8 @@ void Search::addItem(const std::string& optionName,
     _farrGroups[optionName] = farrGroup;
     _farrPaths[optionName] = farrPath;
 	_farrIconPaths[optionName] = farrIconPath;
+
+    _optionNames.insert(optionName);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

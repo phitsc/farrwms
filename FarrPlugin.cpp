@@ -73,9 +73,10 @@ void FarrPlugin::search(const char* rawSearchString)
 
     std::string searchName;
     std::string searchTerm;
-
     _currentOptionName = "";
-    splitSearch(searchString, searchName, _currentOptionName, searchTerm);
+    bool hasOption = false;
+
+    splitSearch(searchString, searchName, _currentOptionName, searchTerm, hasOption);
 
     if(!searchName.empty())
 	{
@@ -95,7 +96,7 @@ void FarrPlugin::search(const char* rawSearchString)
                 return; // searching continues
 			}
         }
-        else if(!_currentOptionName.empty())
+        else if(!_currentOptionName.empty() || hasOption)
         {
             listOptions(searchName, _currentOptionName);
         }
@@ -169,8 +170,29 @@ void FarrPlugin::addSearchToResults(const Search& search, const std::string& fil
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FarrPlugin::listOptions(const std::string& /*searchName*/, const std::string& /*filter*/)
+void FarrPlugin::listOptions(const std::string& searchName, const std::string& filter)
 {
+    if(!searchName.empty())
+    {
+        Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
+        if(it != _searches.end())
+        {
+            const Search& search = (*it);
+
+            std::for_each(search.optionNamesBegin(), search.optionNamesEnd(), std::tr1::bind(&FarrPlugin::addOptionToResults, this, search, _1, filter));
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::addOptionToResults(const Search& search, const std::string& optionName, const std::string& filter)
+{
+    if(filter.empty() || util::String::containsSubstringNoCase(optionName, filter))
+    {
+        const std::string caption = search.getName() + " - " + optionName;
+        _farrItems.push_back(FarrItem(caption, search.getDescription(optionName), _farrAlias + search.getName() + " +" + optionName, search.getFarrIconPath(optionName), true));
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,7 +216,7 @@ extern HINSTANCE dllInstanceHandle;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FarrPlugin::splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm)
+void FarrPlugin::splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasOption)
 {
  	const std::string::size_type pos1 = searchString.find(' ');
 	if(pos1 != std::string::npos)
@@ -204,6 +226,8 @@ void FarrPlugin::splitSearch(const std::string& searchString, std::string& searc
 
         if(!potentialOptionAndSearchTerm.empty() && (potentialOptionAndSearchTerm.substr(0, 1).find_first_of("+/-") == 0))
         {
+            hasOption = true;
+
             const std::string::size_type pos2 = potentialOptionAndSearchTerm.find(' ');
             if(pos2 != std::string::npos)
             {
