@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <set>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -35,6 +36,13 @@ public:
 	const std::string& getFarrGroup(const std::string& optionName) const { return getItem(optionName, _farrGroups); }
 	const std::string& getFarrPath(const std::string& optionName) const { return getItem(optionName, _farrPaths); }
 	const std::string& getFarrIconPath(const std::string& optionName) const { return getItem(optionName, _farrIconPaths); }
+
+    typedef std::set<std::string> OptionNames;
+
+    typedef OptionNames::const_iterator OptionNamesConstIterator;
+
+    OptionNamesConstIterator optionNamesBegin() const { return _optionNames.begin(); }
+    OptionNamesConstIterator optionNamesEnd() const { return _optionNames.end(); }
 
 private:
     typedef std::map<std::string, std::string> Strings;
@@ -71,6 +79,8 @@ private:
 	Strings _farrGroups;
 	Strings _farrPaths;
 	Strings _farrIconPaths;
+
+    OptionNames _optionNames;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,7 +102,6 @@ private:
     static bool isValidRegularExpression(const std::string& searchName, const std::string& categoryName, const std::string& pattern);
 	static std::string findIconPath(const std::string& searchFile);
 
-	typedef std::vector<Search> SearchCollection;
 	SearchCollection _searches;
 };
 

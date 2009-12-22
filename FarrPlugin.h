@@ -34,6 +34,7 @@ private:
     void listSearches(const std::string& filter);
     void listOptions(const std::string& searchName, const std::string& filter);
     void addSearchToResults(const Search& search, const std::string& filter);
+    void addOptionToResults(const Search& search, const std::string& optionName, const std::string& filter);
 
     const Search* _currentSearch;
     std::string   _currentOptionName;
@@ -58,7 +59,7 @@ private:
     // some helper functions
     void signalSearchStateChanged(bool isSearching, FarrItems::size_type itemCount = 0);
 
-    static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm);
+    static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasOption);
     static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
     static std::string replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match);
