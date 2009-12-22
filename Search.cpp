@@ -98,7 +98,7 @@ bool Searches::isValidRegularExpression(const std::string& searchName, const std
     catch(const std::tr1::regex_error& e) 
     { 
         std::stringstream stream;
-        stream << searchName << " [" << categoryName << "]. Invalid Regular Expression. " << e.what() << "(" << e.code() << ")" << std::endl;
+        stream << searchName << " [" << categoryName << "]. Invalid Regular Expression. " << e.what() << " (" << e.code() << ")" << std::endl;
 
         OutputDebugString(stream.str().c_str());
 
