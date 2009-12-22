@@ -495,7 +495,7 @@ PREFUNCDEF BOOL EFuncName_Request_ItemResultByIndex(int resultindex, char* destb
 
     const FarrItem& item = farrPlugin->getItem(resultindex);
 
-    *entrytypep = E_EntryType_URL;
+    *entrytypep = item.isAlias ? E_EntryType_ALIAS : E_EntryType_URL;
     util::String::copyString(destbuf_caption, maxlen, item.caption);
     util::String::copyString(destbuf_path, maxlen, item.path);
     util::String::copyString(destbuf_groupname, maxlen, item.group);
@@ -543,15 +543,30 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const c
     {
         //bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
 
-        std::string url = std::string("http://") + destbuf_path;
+        std::string path(destbuf_path); 
 
-        SHELLEXECUTEINFO info = { sizeof(SHELLEXECUTEINFO) };
-        info.lpFile = url.c_str();
-        ShellExecuteEx(&info);
+        if(path.find(farrPlugin->getAlias()) == 0)
+        {
+            *closeafterp = FALSE;
 
-        *closeafterp = TRUE;
+            path += " ";
 
-        return TRUE;
+            callbackfp_set_strval(hostptr, "setsearch", (char*)path.c_str());
+
+            return TRUE;
+        }
+        else
+        {
+            const std::string url = std::string("http://") + path;
+
+            SHELLEXECUTEINFO info = { sizeof(SHELLEXECUTEINFO) };
+            info.lpFile = url.c_str();
+            ShellExecuteEx(&info);
+
+            *closeafterp = TRUE;
+
+            return TRUE;
+        }
     }
 
     // does this plugin want to take over launching of this result?

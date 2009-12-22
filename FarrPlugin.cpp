@@ -71,24 +71,22 @@ void FarrPlugin::search(const char* rawSearchString)
     // remove rmilk alias
     searchString.erase(0, _farrAlias.length());
 
-	const std::string::size_type pos = searchString.find(' ');
-	if(pos != std::string::npos)
+    std::string searchName;
+    std::string searchTerm;
+
+    _currentOptionName = "";
+    splitSearch(searchString, searchName, _currentOptionName, searchTerm);
+
+    if(!searchName.empty())
 	{
-		const std::string searchName = searchString.substr(0, pos);
-		const std::string searchTerm = searchString.substr(pos + 1);
-
-		if(!searchTerm.empty())
-		{
-            if(searchTerm.substr(0, 1).find_first_of("+/-") == 0)
-            {
-            }
-
+        if(!searchTerm.empty())
+        {
 			Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
 			if(it != _searches.end())
 			{
 				_currentSearch = &(*it);
 
-				const std::string searchUrl = _currentSearch->getSearchUrl("") + searchTerm;
+				const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + searchTerm;
 
 				_xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                 _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
@@ -96,7 +94,11 @@ void FarrPlugin::search(const char* rawSearchString)
 
                 return; // searching continues
 			}
-		}
+        }
+        else if(!_currentOptionName.empty())
+        {
+            listOptions(searchName, _currentOptionName);
+        }
 	}
     else
     {
@@ -129,18 +131,18 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 {
     clearResults();
 
-    const std::tr1::cregex_iterator::regex_type regexType(_currentSearch->getResultPattern(""));
+    const std::tr1::cregex_iterator::regex_type regexType(_currentSearch->getResultPattern(_currentOptionName));
 
     std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
     std::tr1::cregex_iterator end;
     for( ; it != end; ++it)
     {
         const std::tr1::cmatch match = *it;
-        const std::string caption = replaceSubexpressions(_currentSearch->getFarrCaption(""), match);
-        const std::string group = replaceSubexpressions(_currentSearch->getFarrGroup(""), match);
-        const std::string url = replaceSubexpressions(_currentSearch->getFarrPath(""), match);
+        const std::string caption = replaceSubexpressions(_currentSearch->getFarrCaption(_currentOptionName), match);
+        const std::string group = replaceSubexpressions(_currentSearch->getFarrGroup(_currentOptionName), match);
+        const std::string url = replaceSubexpressions(_currentSearch->getFarrPath(_currentOptionName), match);
 
-        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath("")));
+        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath(_currentOptionName)));
     }
 
     signalSearchStateChanged(false, getItemCount());
@@ -161,8 +163,14 @@ void FarrPlugin::addSearchToResults(const Search& search, const std::string& fil
 
     if(filter.empty() || util::String::containsSubstringNoCase(searchName, filter))
     {
-        _farrItems.push_back(FarrItem(searchName, search.getDescription(""), _farrAlias + search.getName(), search.getFarrIconPath("")));
+        _farrItems.push_back(FarrItem(searchName, search.getDescription(""), _farrAlias + search.getName(), search.getFarrIconPath(""), true));
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::listOptions(const std::string& /*searchName*/, const std::string& /*filter*/)
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,6 +191,36 @@ extern HINSTANCE dllInstanceHandle;
 //
 //    _farrItems.push_back(FarrItem("Donate", "Support this plugin", "www.donationcoder.com/Forums/bb/index.php?action=dlist;sa=search;search=149485;fields=uid", _iconPath + "Donate.ico", new CallTriggerFunctionCommand(this, &FarrPlugin::goweb, "http://www.donationcoder.com/Forums/bb/index.php?action=dlist;sa=search;search=149485;fields=uid")));
 //}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm)
+{
+ 	const std::string::size_type pos1 = searchString.find(' ');
+	if(pos1 != std::string::npos)
+	{
+		searchName = searchString.substr(0, pos1);
+        const std::string potentialOptionAndSearchTerm = searchString.substr(pos1 + 1);
+
+        if(!potentialOptionAndSearchTerm.empty() && (potentialOptionAndSearchTerm.substr(0, 1).find_first_of("+/-") == 0))
+        {
+            const std::string::size_type pos2 = potentialOptionAndSearchTerm.find(' ');
+            if(pos2 != std::string::npos)
+            {
+                optionName = potentialOptionAndSearchTerm.substr(1, pos2 - 1);
+                searchTerm = potentialOptionAndSearchTerm.substr(pos2 + 1);
+            }
+            else
+            {
+                optionName = potentialOptionAndSearchTerm.substr(1);
+            }
+        }
+        else
+        {
+            searchTerm = potentialOptionAndSearchTerm;
+        }
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
