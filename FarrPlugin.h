@@ -26,13 +26,17 @@ public:
     FarrItems::size_type getItemCount() const;
     const FarrItem& getItem(const FarrItems::size_type& index) const;
 
+    const std::string& getAlias() const { return _farrAlias; }
+
 private:
 	Searches _searches;
 
     void listSearches(const std::string& filter);
+    void listOptions(const std::string& searchName, const std::string& filter);
     void addSearchToResults(const Search& search, const std::string& filter);
 
     const Search* _currentSearch;
+    std::string   _currentOptionName;
     bool _isSearching;
 
     MSXML2::IXMLHTTPRequestPtr _xmlHttpRequest;
@@ -54,6 +58,7 @@ private:
     // some helper functions
     void signalSearchStateChanged(bool isSearching, FarrItems::size_type itemCount = 0);
 
+    static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm);
     static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
     static std::string replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match);

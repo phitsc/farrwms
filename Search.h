@@ -44,7 +44,17 @@ private:
         const Strings::const_iterator it = collection.find(optionName);
         if(it != collection.end())
         {
-            return it->second;
+            const std::string& value = it->second;
+            if(!value.empty())
+            {
+                return value;
+            }
+        }
+
+        const Strings::const_iterator it2 = collection.find("");
+        if(it2 != collection.end())
+        {
+            return it2->second;
         }
         else
         {
