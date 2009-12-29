@@ -134,6 +134,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="version.lib shlwapi.lib Rpcrt4.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -161,6 +162,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(OutDir)\$(ProjectName).dll $(ProjectDir)\Deploy\$(ProjectName).dll"
 			/>
 		</Configuration>
 	</Configurations>

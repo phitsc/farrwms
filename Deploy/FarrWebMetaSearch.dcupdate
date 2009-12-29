@@ -14,6 +14,6 @@
     <SignalForUpdate>FindAndRunRobot.exe</SignalForUpdate>
     <CloseForUpdate />
     <BaseDirectory>Find and Run Robot</BaseDirectory>
-    <UpdateFile>http://farrplugins.objecttechnology.com/farrwms/FarrWMS.zip</UpdateFile>
+    <UpdateFile>http://farrplugins.objecttechnology.com/farrwms/FarrWebMetaSearch.zip</UpdateFile>
     <InstallDirectory>Plugins\FarrWebMetaSearch</InstallDirectory>
 </Local>
