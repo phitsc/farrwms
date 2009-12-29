@@ -52,13 +52,13 @@
 //
 #define ThisPlugin_DisplayName			"FarrWebMetaSearch"
 #define ThisPlugin_Author			    "Philipp Tschannen (phitsc)"
-#define ThisPlugin_HomepageURL			"http://farrwebmetasearch.objecttechnology.com"
+#define ThisPlugin_HomepageURL			"http://farrwms.objecttechnology.com"
 #define ThisPlugin_UpdateURL			""
-#define ThisPlugin_ShortDescription		"RegEx Web Search"
-#define ThisPlugin_LongDescription		"RegEx Web Search"
+#define ThisPlugin_ShortDescription		"A generic web retrieval plugin showing results in list mode."
+#define ThisPlugin_LongDescription		"FarrWebMetaSearch is a generic web retrieval FARR plugin that show results in list mode. It is therefore targeted at web sites delivering list-like results. Results are selected using regular expressions."
 //
 // If you support advanced options button, specify caption here, otherwise ""
-#define ThisPlugin_AdvConfigString		"Advanced Options"
+#define ThisPlugin_AdvConfigString		"" // "Advanced Options"
 //
 // If you support a read me file or help file, specify caption here, otherwise ""
 #define ThisPlugin_ReadMeString			"View Help File"

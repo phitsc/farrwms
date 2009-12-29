@@ -68,7 +68,7 @@ void FarrPlugin::search(const char* rawSearchString)
 
     //
     std::string searchString(rawSearchString);
-    // remove rmilk alias
+    // remove plugin alias
     searchString.erase(0, _farrAlias.length());
 
     std::string searchName;
