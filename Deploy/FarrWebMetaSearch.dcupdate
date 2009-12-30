@@ -4,7 +4,7 @@
     <Label>FarrWebMetaSearch</Label>
     <IconFile>FarrWebMetaSearch.ico</IconFile>
     <!-- version info of locally installed current version, and simple remote version file -->
-    <Version>0.9.0</Version>
+    <Version>0.9.1</Version>
     <VersionFileRemote>http://farrplugins.objecttechnology.com/farrwms/versioninfo.xml</VersionFileRemote>
     <!-- where to get more info about the app remotely, only queried once an update is discovered -->
     <InfoFileRemote />

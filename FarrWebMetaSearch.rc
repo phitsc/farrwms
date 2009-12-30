@@ -27,8 +27,8 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,0,0
- PRODUCTVERSION 0,9,0,0
+ FILEVERSION 0,9,1,0
+ PRODUCTVERSION 0,9,1,0
  FILEFLAGSMASK 0x37L
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -44,13 +44,13 @@ BEGIN
         BLOCK "000004b0"
         BEGIN
             VALUE "FileDescription", "FARR Web Meta Search Plugin"
-            VALUE "FileVersion", "0.9.0"
+            VALUE "FileVersion", "0.9.1"
             VALUE "InternalName", "FarrWebMetaSearch.dll"
             VALUE "LegalCopyright", "Copyright (C) 2009 Philipp Tschannen"
             VALUE "OriginalFilename", "FarrWebMetaSearch.dll"
             VALUE "ProductName", "FARR Web Meta Search Plugin"
-            VALUE "ProductVersion", "0.9.0"
-            VALUE "SpecialBuild", "29. December 2009"
+            VALUE "ProductVersion", "0.9.1"
+            VALUE "SpecialBuild", "30. December 2009"
         END
     END
     BLOCK "VarFileInfo"
