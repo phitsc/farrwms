@@ -545,6 +545,9 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const c
 
         std::string path(destbuf_path); 
 
+        OutputDebugString(path.c_str());
+        OutputDebugString("\n");
+
         if(path.find(farrPlugin->getAlias()) == 0)
         {
             *closeafterp = FALSE;
@@ -559,9 +562,7 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const c
         {
             const std::string url = std::string("http://") + path;
 
-            SHELLEXECUTEINFO info = { sizeof(SHELLEXECUTEINFO) };
-            info.lpFile = url.c_str();
-            ShellExecuteEx(&info);
+            callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
 
             *closeafterp = TRUE;
 
