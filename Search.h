@@ -18,7 +18,8 @@ public:
 
     void addItem(const std::string& optionName,
                  const std::string& description,
-                 const std::string& searchUrl, 
+                 const std::string& searchUrl,
+				 bool				isFeed,
                  const std::string& resultPattern, 
                  const std::string& farrCaption, 
                  const std::string& farrGroup, 
@@ -31,6 +32,7 @@ public:
 
     const std::string& getDescription(const std::string& optionName) const { return getItem(optionName, _descriptions); }
 	const std::string& getSearchUrl(const std::string& optionName) const { return getItem(optionName, _searchUrls); }
+    bool		       getIsFeed(const std::string& optionName) const { return getItem(optionName, _isFeeds); }
 	const std::string& getResultPattern(const std::string& optionName) const { return getItem(optionName, _resultPatterns); }
 	const std::string& getFarrCaption(const std::string& optionName) const { return getItem(optionName, _farrCaptions); }
 	const std::string& getFarrGroup(const std::string& optionName) const { return getItem(optionName, _farrGroups); }
@@ -46,6 +48,7 @@ public:
 
 private:
     typedef std::map<std::string, std::string> Strings;
+	typedef std::map<std::string, bool> Bools;
 
     const std::string& getItem(const std::string& optionName, const Strings& collection) const
     {
@@ -71,9 +74,16 @@ private:
         }
     }
 
+    bool getItem(const std::string& optionName, const Bools& collection) const
+    {
+        const Bools::const_iterator it = collection.find(optionName);
+        return (it != collection.end()) ? it->second : false;
+    }
+
     std::string _name;
     Strings _descriptions;
 	Strings _searchUrls;
+	Bools   _isFeeds;
 	Strings _resultPatterns;
 	Strings _farrCaptions;
 	Strings _farrGroups;
