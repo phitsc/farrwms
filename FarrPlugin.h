@@ -38,6 +38,7 @@ private:
 
     const Search* _currentSearch;
     std::string   _currentOptionName;
+    std::string   _currentSearchTerm;
     bool _isSearching;
 
     MSXML2::IXMLHTTPRequestPtr _xmlHttpRequest;
@@ -63,6 +64,7 @@ private:
     static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
     static std::string replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match);
+    static std::string replaceVariable(const std::string& text, const std::string& variable, const std::string& value);
 	//static std::string fixLink(const std::string& link, const std::string& searchUrl);
 
     static void launchFile(const std::string& path);

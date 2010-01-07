@@ -72,22 +72,22 @@ void FarrPlugin::search(const char* rawSearchString)
     searchString.erase(0, _farrAlias.length());
 
     std::string searchName;
-    std::string searchTerm;
     _currentOptionName = "";
+    _currentSearchTerm = "";
     bool hasOption = false;
 
-    splitSearch(searchString, searchName, _currentOptionName, searchTerm, hasOption);
+    splitSearch(searchString, searchName, _currentOptionName, _currentSearchTerm, hasOption);
 
     if(!searchName.empty())
 	{
-        if(!searchTerm.empty())
+        if(!_currentSearchTerm.empty())
         {
 			Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
 			if(it != _searches.end())
 			{
 				_currentSearch = &(*it);
 
-				const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + searchTerm;
+				const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm;
 
 				_xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                 _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
@@ -132,7 +132,8 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 {
     clearResults();
 
-    const std::tr1::cregex_iterator::regex_type regexType(_currentSearch->getResultPattern(_currentOptionName));
+    const std::string resultPattern = replaceVariable(_currentSearch->getResultPattern(_currentOptionName), "%SEARCHTERM%", _currentSearchTerm);
+    const std::tr1::cregex_iterator::regex_type regexType(resultPattern);
 
     std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
     std::tr1::cregex_iterator end;
@@ -278,6 +279,9 @@ std::string FarrPlugin::replaceCharacterEntityReferences(const std::string& text
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&apos;"), std::string("'"));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&lt;"), std::string("<"));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&gt;"), std::string(">"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&reg;"), std::string("®"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#174;"), std::string("®"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&copy;"), std::string("©"));
 
     return temp;
 }
@@ -308,6 +312,13 @@ std::string FarrPlugin::replaceSubexpressions(const std::string& text, const std
     }
 
     return replaceCharacterEntityReferences(temp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string FarrPlugin::replaceVariable(const std::string& text, const std::string& variable, const std::string& value)
+{
+    return std::tr1::regex_replace(text, std::tr1::regex(variable), value);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

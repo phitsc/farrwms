@@ -537,9 +537,7 @@ PREFUNCDEF BOOL EFuncName_Request_TextResultCharp(char **charp)
 //
 PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT /*entrytype*/, void* /*tagvoidp*/, BOOL* closeafterp)
 {
-    //TriggerCommand* triggerCommand = (TriggerCommand*)tagvoidp;
-
-    if((thispluginid == pluginid) /*&& (triggerCommand != 0)*/)
+    if(thispluginid == pluginid)
     {
         //bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
 
