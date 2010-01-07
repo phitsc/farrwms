@@ -80,25 +80,42 @@ void FarrPlugin::search(const char* rawSearchString)
 
     if(!searchName.empty())
 	{
-        if(!_currentSearchTerm.empty())
-        {
-			Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
-			if(it != _searches.end())
-			{
-				_currentSearch = &(*it);
+		Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
+		if(it != _searches.end())
+		{
+			_currentSearch = &(*it);
 
-				const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm;
+            const bool isFeed = _currentSearch->getIsFeed(_currentOptionName);
+            if(isFeed)
+            {
+                if(_currentSearchTerm.empty())
+                {
+                    const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName);
 
-				_xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
-                _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
-				_xmlHttpRequest->send();
+                    _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
+                    _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
+                    _xmlHttpRequest->send();
 
-                return; // searching continues
-			}
-        }
-        else if(!_currentOptionName.empty() || hasOption)
-        {
-            listOptions(searchName, _currentOptionName);
+                    return; // searching continues
+                }
+            }
+            else
+            {
+                if(!_currentSearchTerm.empty())
+                {
+                    const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm;
+
+                    _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
+                    _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
+                    _xmlHttpRequest->send();
+
+                    return; // searching continues
+                }
+                else if(!_currentOptionName.empty() || hasOption)
+                {
+                    listOptions(searchName, _currentOptionName);
+                }
+            }
         }
 	}
     else

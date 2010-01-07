@@ -63,6 +63,7 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
         search.addItem(categoryName, 
                        iniFile.getParameterValue(categoryName, "description", ""),
                        iniFile.getParameterValue(categoryName, "searchUrl", ""), 
+                       (iniFile.getParameterValue(categoryName, "isFeed", "false") == "true"),
                        pattern, 
                        iniFile.getParameterValue(categoryName, "farrCaption", ""),
                        iniFile.getParameterValue(categoryName, "farrGroup", ""),
@@ -124,6 +125,7 @@ Search::Search(const std::string& name) :
 void Search::addItem(const std::string& optionName,
                      const std::string& description,
                      const std::string& searchUrl, 
+                     bool				isFeed,
                      const std::string& resultPattern, 
                      const std::string& farrCaption, 
                      const std::string& farrGroup, 
@@ -132,6 +134,7 @@ void Search::addItem(const std::string& optionName,
 {
     _descriptions[optionName] = description;
 	_searchUrls[optionName] = searchUrl;
+    _isFeeds[optionName] = isFeed;
 	_resultPatterns[optionName] = resultPattern;
     _farrCaptions[optionName] = farrCaption;
     _farrGroups[optionName] = farrGroup;
