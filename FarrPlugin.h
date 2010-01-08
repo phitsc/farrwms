@@ -33,8 +33,10 @@ private:
 
     void listSearches(const std::string& filter);
     void listOptions(const std::string& searchName, const std::string& filter);
+    void listCachedItems(const std::string& filter);
     void addSearchToResults(const Search& search, const std::string& filter);
     void addOptionToResults(const Search& search, const std::string& optionName, const std::string& filter);
+    void addItemToResults(const FarrItem& farrItem, const std::string& filter);
 
     const Search* _currentSearch;
     std::string   _currentOptionName;
@@ -54,6 +56,8 @@ private:
 
     // task vector for item retrieval by FARR 
     FarrItems _farrItems;
+
+    FarrItems _farrItemCache;
 
     void clearResults();
 
