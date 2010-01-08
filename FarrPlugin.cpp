@@ -90,6 +90,8 @@ void FarrPlugin::search(const char* rawSearchString)
             {
                 if(_currentSearchTerm.empty())
                 {
+                    _farrItemCache.clear();
+
                     const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName);
 
                     _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
@@ -97,6 +99,10 @@ void FarrPlugin::search(const char* rawSearchString)
                     _xmlHttpRequest->send();
 
                     return; // searching continues
+                }
+                else
+                {
+                    listCachedItems(_currentSearchTerm);
                 }
             }
             else
@@ -164,6 +170,8 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
         _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath(_currentOptionName)));
     }
 
+    _farrItemCache = _farrItems;
+
     signalSearchStateChanged(false, getItemCount());
 }
 
@@ -204,12 +212,29 @@ void FarrPlugin::listOptions(const std::string& searchName, const std::string& f
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void FarrPlugin::listCachedItems(const std::string& filter)
+{
+    std::for_each(_farrItemCache.begin(), _farrItemCache.end(), std::tr1::bind(&FarrPlugin::addItemToResults, this, _1, filter));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void FarrPlugin::addOptionToResults(const Search& search, const std::string& optionName, const std::string& filter)
 {
     if(filter.empty() || util::String::containsSubstringNoCase(optionName, filter))
     {
         const std::string caption = search.getName() + " - " + optionName;
         _farrItems.push_back(FarrItem(caption, search.getDescription(optionName), _farrAlias + search.getName() + " +" + optionName, search.getFarrIconPath(optionName), true));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::addItemToResults(const FarrItem& farrItem, const std::string& filter)
+{
+    if(filter.empty() || util::String::containsSubstringNoCase(farrItem.caption, filter))
+    {
+        _farrItems.push_back(farrItem);
     }
 }
 
