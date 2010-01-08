@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by FarrRmilk.rc
+// Used by FarrWebMetaSearch.rc
 //
 
 // Next default values for new objects
