@@ -27,8 +27,8 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,1,0
- PRODUCTVERSION 0,9,1,0
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x37L
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -44,13 +44,13 @@ BEGIN
         BLOCK "000004b0"
         BEGIN
             VALUE "FileDescription", "FARR Web Meta Search Plugin"
-            VALUE "FileVersion", "0.9.1"
+            VALUE "FileVersion", "1.0.0"
             VALUE "InternalName", "FarrWebMetaSearch.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2009 Philipp Tschannen"
+            VALUE "LegalCopyright", "Copyright (C) 2010 Philipp Tschannen"
             VALUE "OriginalFilename", "FarrWebMetaSearch.dll"
             VALUE "ProductName", "FARR Web Meta Search Plugin"
-            VALUE "ProductVersion", "0.9.1"
-            VALUE "SpecialBuild", "30. December 2009"
+            VALUE "ProductVersion", "1.0.0"
+            VALUE "SpecialBuild", "8. January 2010"
         END
     END
     BLOCK "VarFileInfo"
@@ -71,64 +71,6 @@ END
 LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
 #pragma code_page(1252)
 #endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_SET_TEXT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 365
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 39
-    END
-
-    IDD_SELECT_TEXT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 365
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 39
-    END
-
-    IDD_DIALOG_OPTIONS, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 372
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 256
-    END
-
-    IDD_EDIT_TEXT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 365
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 95
-    END
-
-    IDD_EDIT_MAIN_PROPERTIES, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 449
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 110
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
