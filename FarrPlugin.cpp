@@ -69,6 +69,7 @@ void FarrPlugin::search(const char* rawSearchString)
     //
     std::string searchString(rawSearchString);
     // remove plugin alias
+    const bool hasSpaceAfterAlias = (searchString.length() == _farrAlias.length());
     searchString.erase(0, _farrAlias.length());
 
     std::string searchName;
@@ -129,6 +130,11 @@ void FarrPlugin::search(const char* rawSearchString)
         else
         {
             listSearches(searchString);
+
+            if(hasSpaceAfterAlias && searchString.empty())
+            {
+                setStatusText("Type ? and hit enter to show help file.");
+            }
         }
     }
 

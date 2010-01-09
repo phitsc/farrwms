@@ -522,7 +522,7 @@ Also see [[AdvancedOptions]]</pre>
 <div title="Disclaimer" modifier="phitsc" created="201001082250" changecount="1">
 <pre>FarrWebMetaSearch is provided 'as is'. No warranty of any kind is expressed or implied. Use it at your own risk.</pre>
 </div>
-<div title="Introduction" modifier="phitsc" created="201001082252" modified="201001082313" changecount="7">
+<div title="Introduction" modifier="phitsc" created="201001082252" modified="201001092058" changecount="15">
 <pre>FarrWebMetaSearch is a generic web retrieval FARR plugin that show results in list mode. It is therefore targeted at web sites delivering list-like results. Results are selected using regular expressions. FarrWebMetaSearch searches live as you type!
 
 !!!Basic usage
@@ -536,15 +536,60 @@ to use a pre-configured search.
 Typing +, - or / after the search name will display available options. {{{[+option]}}} is optional. It currently has to follow right after the search name.
 
 If {{{[search]}}} is configured as a web search, {{{[search term]}}} will be searched live as you type. If {{{[search]}}} is configured as a feed, {{{[search term]}}} will filter the found results. In this case {{{[search term]}}} is optional.
+
+
+Type {{{ wms ? }}} to open this help file in an external browser.
 </pre>
 </div>
-<div title="MainMenu" modifier="phitsc" created="201001082231" changecount="1">
+<div title="MainMenu" modifier="phitsc" created="201001082231" modified="201001092100" changecount="2">
 <pre>[[Introduction]]
-[[.config Files]]
+[[Search config files]]
 [[Todo]]
 [[Version history]]
 [[Credits]]
 [[Disclaimer]]</pre>
+</div>
+<div title="Search config files" modifier="phitsc" created="201001092100" modified="201001092119" changecount="10">
+<pre>New searches can be added to the FarrWebMetaSearch plugin by adding search configuration files. Search configuration files have the {{{.config}}} file extension and have to be in the plugin's {{{searches}}} subdirectory.
+
+!Basics
+The .config file format is similar to that of .ini files. Lines starting with a semicolon character are not considered part of the configuration (they are treated as comments).
+
+The name of the file (without the .config extension) defines the name of the search.
+
+!Parameters
+Parameter names (on the left of the =) are case sensitive.
+
+A basic search configuration file should have the following parameters defined:
+
+| !Parameter name | !Description |
+| description | A description for the search |
+| contributor | Name of search config file contributor |
+| searchUrl | URL of the search |
+| resultPattern | Regular expression that is applied to the search web page in order to grab the results |
+| farrCaption | Caption of result item |
+| farrGroup | Smaller line beneath the caption of the result item |
+| farrPath | URL which is launched when triggering a result item |
+
+!Example
+
+msdn.config
+
+{{{
+description=Microsoft Developer Network
+searchUrl=http://social.msdn.microsoft.com/Search/en-GB?query=
+resultPattern=&lt;a onmousedown=\&quot;.*\&quot; href=\&quot;.*\&quot;&gt;(.*)&lt;/a&gt;\r\n&lt;br/&gt;\r\n&lt;div class=\&quot;ResultDescription\&quot;&gt;(.*)&lt;/div&gt;\r\n&lt;div class=\&quot;ResultUrl\&quot;&gt;(.*)&lt;/div&gt;
+farrCaption=$1
+farrGroup=$2
+farrPath=$3
+}}}
+
+!Feeds
+FarrWebMetaSearch can be used to search feeds. The behaviour is different to the live searches though. To defined a feed, add the isFeed parameter to the .config file:
+
+{{{isFeed=true}}}
+
+A search defined as a feed will start searching as soon as one enters a space after the search name. Once the results are displayed, the search terms typed will narrow down the results to match the entered search terms. (note that starting to type search terms before the result items are displayed will currently stop the search).</pre>
 </div>
 <div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201001082303" changecount="2">
 <pre>1.0.0</pre>
@@ -552,9 +597,9 @@ If {{{[search]}}} is configured as a web search, {{{[search term]}}} will be sea
 <div title="SiteTitle" modifier="phitsc" created="201001082227" changecount="1">
 <pre>FarrWebMetaSearch</pre>
 </div>
-<div title="Todo" modifier="phitsc" created="201001082301" changecount="1">
+<div title="Todo" modifier="phitsc" created="201001082301" modified="201001092120" changecount="2">
 <pre>* Fix icon copyright problem
-* Improve help file. Especially, add [[.config Files]] topic
+* Improve help file. Especially, extend [[Search config files]] topic
 * Add a way for users to contribute / get searches
 * Add logging / notification in case a configuration files is invalid
 * Make original search string available as a variable in output
