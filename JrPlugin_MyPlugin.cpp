@@ -495,7 +495,7 @@ PREFUNCDEF BOOL EFuncName_Request_ItemResultByIndex(int resultindex, char* destb
 
     const FarrItem& item = farrPlugin->getItem(resultindex);
 
-    *entrytypep = item.isAlias ? E_EntryType_ALIAS : E_EntryType_URL;
+    *entrytypep = (E_EntryTypeT)item.entryType;
     util::String::copyString(destbuf_caption, maxlen, item.caption);
     util::String::copyString(destbuf_path, maxlen, item.path);
     util::String::copyString(destbuf_groupname, maxlen, item.group);
@@ -535,7 +535,7 @@ PREFUNCDEF BOOL EFuncName_Request_TextResultCharp(char **charp)
 // Return TRUE to takeover launching and prevent all other further launching
 // or FALSE to continue launching after we return
 //
-PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT /*entrytype*/, void* /*tagvoidp*/, BOOL* closeafterp)
+PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT entrytype, void* /*tagvoidp*/, BOOL* closeafterp)
 {
     if(thispluginid == pluginid)
     {
@@ -546,25 +546,38 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const c
         OutputDebugString(path.c_str());
         OutputDebugString("\n");
 
-        if(path.find(farrPlugin->getAlias()) == 0)
+        switch(entrytype)
         {
-            *closeafterp = FALSE;
+        case E_EntryType_ALIAS:
+            {
+                *closeafterp = FALSE;
 
-            path += " ";
+                path += " ";
 
-            callbackfp_set_strval(hostptr, "setsearch", (char*)path.c_str());
+                callbackfp_set_strval(hostptr, "setsearch", (char*)path.c_str());
 
-            return TRUE;
-        }
-        else
-        {
-            const std::string url = std::string("http://") + path;
+                return TRUE;
+            }
 
-            callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
+        case E_EntryType_FILE:
+            {
+                *closeafterp = TRUE;
 
-            *closeafterp = TRUE;
+                const std::string file = util::String::quoteSpaces(path);
+                callbackfp_set_strval(hostptr, "launch", (char*)file.c_str());
 
-            return TRUE;
+                return TRUE;
+            }
+
+        case E_EntryType_URL:
+            {
+                *closeafterp = TRUE;
+
+                const std::string url = std::string("http://") + path;
+                callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
+
+                return TRUE;
+            }
         }
     }
 

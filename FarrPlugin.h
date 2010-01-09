@@ -31,6 +31,11 @@ public:
 private:
 	Searches _searches;
 
+    bool processCommand(const std::string& searchString);
+
+    void listHelpItems();
+    void listAboutItems();
+
     void listSearches(const std::string& filter);
     void listOptions(const std::string& searchName, const std::string& filter);
     void listCachedItems(const std::string& filter);

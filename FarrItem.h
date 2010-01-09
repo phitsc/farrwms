@@ -9,12 +9,20 @@
 
 struct FarrItem
 {
-    FarrItem(const std::string& caption_, const std::string& group_, const std::string& path_, const std::string& iconPath_, bool isAlias_ = false)
+    enum EntryType
+    {
+        Unknown = 0,
+        File = 1,
+        Alias = 3,
+        Url = 4,
+    };
+
+    FarrItem(const std::string& caption_, const std::string& group_, const std::string& path_, const std::string& iconPath_, EntryType entryType_)
         :caption(caption_),
          group(group_),
          path(path_),
          iconPath(iconPath_),
-         isAlias(isAlias_)
+         entryType(entryType_)
     {}
 
     bool operator<(const FarrItem& farrItem) const
@@ -26,7 +34,7 @@ struct FarrItem
     std::string group;
     std::string path;
     std::string iconPath;
-    bool        isAlias;
+    EntryType   entryType;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

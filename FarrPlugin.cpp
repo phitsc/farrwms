@@ -76,57 +76,60 @@ void FarrPlugin::search(const char* rawSearchString)
     _currentSearchTerm = "";
     bool hasOption = false;
 
-    splitSearch(searchString, searchName, _currentOptionName, _currentSearchTerm, hasOption);
+    if(!processCommand(searchString))
+    {
+        splitSearch(searchString, searchName, _currentOptionName, _currentSearchTerm, hasOption);
 
-    if(!searchName.empty())
-	{
-		Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
-		if(it != _searches.end())
-		{
-			_currentSearch = &(*it);
+        if(!searchName.empty())
+	    {
+		    Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
+		    if(it != _searches.end())
+		    {
+			    _currentSearch = &(*it);
 
-            const bool isFeed = _currentSearch->getIsFeed(_currentOptionName);
-            if(isFeed)
-            {
-                if(_currentSearchTerm.empty())
+                const bool isFeed = _currentSearch->getIsFeed(_currentOptionName);
+                if(isFeed)
                 {
-                    _farrItemCache.clear();
+                    if(_currentSearchTerm.empty())
+                    {
+                        _farrItemCache.clear();
 
-                    const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName);
+                        const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName);
 
-                    _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
-                    _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
-                    _xmlHttpRequest->send();
+                        _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
+                        _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
+                        _xmlHttpRequest->send();
 
-                    return; // searching continues
+                        return; // searching continues
+                    }
+                    else
+                    {
+                        listCachedItems(_currentSearchTerm);
+                    }
                 }
                 else
                 {
-                    listCachedItems(_currentSearchTerm);
+                    if(!_currentSearchTerm.empty())
+                    {
+                        const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm;
+
+                        _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
+                        _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
+                        _xmlHttpRequest->send();
+
+                        return; // searching continues
+                    }
+                    else if(!_currentOptionName.empty() || hasOption)
+                    {
+                        listOptions(searchName, _currentOptionName);
+                    }
                 }
             }
-            else
-            {
-                if(!_currentSearchTerm.empty())
-                {
-                    const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm;
-
-                    _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
-                    _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
-                    _xmlHttpRequest->send();
-
-                    return; // searching continues
-                }
-                else if(!_currentOptionName.empty() || hasOption)
-                {
-                    listOptions(searchName, _currentOptionName);
-                }
-            }
+	    }
+        else
+        {
+            listSearches(searchString);
         }
-	}
-    else
-    {
-        listSearches(searchString);
     }
 
     signalSearchStateChanged(false, getItemCount());
@@ -167,12 +170,39 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
         const std::string group = replaceSubexpressions(_currentSearch->getFarrGroup(_currentOptionName), match);
         const std::string url = replaceSubexpressions(_currentSearch->getFarrPath(_currentOptionName), match);
 
-        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath(_currentOptionName)));
+        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath(_currentOptionName), FarrItem::Url));
     }
 
     _farrItemCache = _farrItems;
 
     signalSearchStateChanged(false, getItemCount());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::listHelpItems()
+{
+    _farrItems.push_back(FarrItem("Show help", "Open help file in an external browser.", _helpFile, _iconPath + "Help.ico", FarrItem::File));
+
+    const std::string alias2 = _farrAlias + "!about";
+    _farrItems.push_back(FarrItem("About", "", alias2, _iconPath + "About.ico", FarrItem::Alias));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+extern HINSTANCE dllInstanceHandle;
+
+void FarrPlugin::listAboutItems()
+{
+    util::VersionInfo versionInfo(dllInstanceHandle);
+    const std::string version = versionInfo.getFileVersion().getAsString() + " - " + versionInfo.getSpecialBuild();
+    _farrItems.push_back(FarrItem(version, "Visit FarrWebMetaSearch Web Site", "farrwms.objecttechnology.com", _iconPath + "FarrWebMetaSearch.ico", FarrItem::Url));
+
+    _farrItems.push_back(FarrItem("Philipp Tschannen (phitsc)", "Idea & Programming", "phitsc@gmail.com", _iconPath + "Philipp.ico", FarrItem::Unknown));
+
+    _farrItems.push_back(FarrItem("Carroll - (hamradio on donationcoder.com forums)", "Icon Design", "www.hamradiousa.net", _iconPath + "Hamradio.ico", FarrItem::Url));
+
+    _farrItems.push_back(FarrItem("Donate", "Support this plugin", "www.donationcoder.com/Forums/bb/index.php?action=dlist;sa=search;search=149485;fields=uid", _iconPath + "Donate.ico", FarrItem::Url));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,7 +220,7 @@ void FarrPlugin::addSearchToResults(const Search& search, const std::string& fil
 
     if(filter.empty() || util::String::containsSubstringNoCase(searchName, filter))
     {
-        _farrItems.push_back(FarrItem(searchName, search.getDescription(""), _farrAlias + search.getName(), search.getFarrIconPath(""), true));
+        _farrItems.push_back(FarrItem(searchName, search.getDescription(""), _farrAlias + search.getName(), search.getFarrIconPath(""), FarrItem::Alias));
     }
 }
 
@@ -224,7 +254,7 @@ void FarrPlugin::addOptionToResults(const Search& search, const std::string& opt
     if(filter.empty() || util::String::containsSubstringNoCase(optionName, filter))
     {
         const std::string caption = search.getName() + " - " + optionName;
-        _farrItems.push_back(FarrItem(caption, search.getDescription(optionName), _farrAlias + search.getName() + " +" + optionName, search.getFarrIconPath(optionName), true));
+        _farrItems.push_back(FarrItem(caption, search.getDescription(optionName), _farrAlias + search.getName() + " +" + optionName, search.getFarrIconPath(optionName), FarrItem::Alias));
     }
 }
 
@@ -242,20 +272,28 @@ void FarrPlugin::addItemToResults(const FarrItem& farrItem, const std::string& f
 
 extern HINSTANCE dllInstanceHandle;
 
-//void FarrPlugin::showAbout(const std::string& /*searchString*/)
-//{
-//    clearResults();
-//
-//    util::VersionInfo versionInfo(dllInstanceHandle);
-//    const std::string version = versionInfo.getFileVersion().getAsString() + " - " + versionInfo.getSpecialBuild();
-//    _farrItems.push_back(FarrItem(version, "Visit FarrMilk Web Site", "farrmilk.objecttechnology.com", _iconPath + "FarrMilk.ico", new CallTriggerFunctionCommand(this, &FarrPlugin::goweb, "http://farrmilk.objecttechnology.com")));
-//
-//    _farrItems.push_back(FarrItem("Philipp Tschannen (phitsc)", "Idea & Programming", "phitsc@gmail.com", _iconPath + "Philipp.ico", new CallTriggerFunctionCommand(this, &FarrPlugin::goweb, "mailto:phitsc@gmail.com")));
-//
-//    _farrItems.push_back(FarrItem("Carroll - (hamradio on donationcoder.com forums)", "Icon Design", "www.hamradiousa.net", _iconPath + "Hamradio.ico", new CallTriggerFunctionCommand(this, &FarrPlugin::goweb, "http://www.hamradiousa.net/")));
-//
-//    _farrItems.push_back(FarrItem("Donate", "Support this plugin", "www.donationcoder.com/Forums/bb/index.php?action=dlist;sa=search;search=149485;fields=uid", _iconPath + "Donate.ico", new CallTriggerFunctionCommand(this, &FarrPlugin::goweb, "http://www.donationcoder.com/Forums/bb/index.php?action=dlist;sa=search;search=149485;fields=uid")));
-//}
+///////////////////////////////////////////////////////////////////////////////
+
+bool FarrPlugin::processCommand(const std::string& searchString)
+{
+    if(!searchString.empty())
+    {
+        if(searchString[0] == '?')
+        {
+            listHelpItems();
+
+            return true;
+        }
+        else if(searchString.find("!about") == 0)
+        {
+            listAboutItems();
+
+            return true;
+        }
+    }
+
+    return false;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
