@@ -1,7 +1,6 @@
 #include "FarrPlugin.h"
-#include "JrPlugin_GenericShell.h"
-#include "JrPlugin_MyPlugin.h"
 #include "Util.h"
+#include "Farr.h"
 
 #include <sstream>
 
@@ -16,7 +15,7 @@ FarrPlugin::FarrPlugin(const std::string& modulePath) :
     _currentSearch(0),
     _isSearching(false),
     _iconPath(modulePath + "\\icons\\"),
-    _helpFile(modulePath + "\\" + ThisPlugin_ReadMeFile),
+    _helpFile(modulePath + "\\" + farr::getReadMeFileName()),
 	_searches(modulePath + "\\searches\\")
 {
     _xmlHttpRequest.CreateInstance(L"Msxml2.XMLHTTP.3.0");
@@ -59,10 +58,10 @@ void FarrPlugin::search(const char* rawSearchString)
 {
     if(_farrAlias.empty())
     {
-        _farrAlias = getPluginAlias() + " ";
+        _farrAlias = farr::getPluginAlias() + " ";
     }
 
-    signalSearchStateChanged(true);
+    _isSearching = farr::signalSearchStateChanged(true);
 
     clearResults();
 
@@ -133,12 +132,12 @@ void FarrPlugin::search(const char* rawSearchString)
 
             if(hasSpaceAfterAlias && searchString.empty())
             {
-                setStatusText("Type ? and hit enter to show help file.");
+                farr::setStatusText("Type ? and hit enter to show help file.");
             }
         }
     }
 
-    signalSearchStateChanged(false, getItemCount());
+    _isSearching = farr::signalSearchStateChanged(false, getItemCount());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -148,7 +147,7 @@ void FarrPlugin::stopSearch()
     _xmlHttpRequest->abort();
     clearResults();
 
-    signalSearchStateChanged(false);
+    _isSearching = farr::signalSearchStateChanged(false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,6 +166,12 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     const std::string resultPattern = replaceVariable(_currentSearch->getResultPattern(_currentOptionName), "%SEARCHTERM%", _currentSearchTerm);
     const std::tr1::cregex_iterator::regex_type regexType(resultPattern);
 
+    std::stringstream stream;
+    stream << "search term: '" << _currentSearchTerm << "'\n";
+    stream << "regex: '" << resultPattern << "'\n";
+
+    OutputDebugString(stream.str().c_str());
+
     std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
     std::tr1::cregex_iterator end;
     for( ; it != end; ++it)
@@ -181,7 +186,7 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
     _farrItemCache = _farrItems;
 
-    signalSearchStateChanged(false, getItemCount());
+    _isSearching = farr::signalSearchStateChanged(false, getItemCount());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -426,81 +431,5 @@ std::string FarrPlugin::replaceVariable(const std::string& text, const std::stri
 //
 //	return link;
 //}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void FarrPlugin::launchFile(const std::string& path)
-{
-    SHELLEXECUTEINFO info = { sizeof(SHELLEXECUTEINFO) };
-    info.lpFile = path.c_str();
-    ShellExecuteEx(&info);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void FarrPlugin::setStatusText(const std::string& statusText)
-{
-    callbackfp_set_strval(hostptr, "statusbar", (TCHAR*)statusText.c_str());
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void FarrPlugin::setNewSearch(const std::string& searchText)
-{
-    callbackfp_set_strval(hostptr, "setsearch", (char*)searchText.c_str());
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-HWND FarrPlugin::getFarrMainWindow()
-{
-    HWND mainFarrWindow = 0;
-    callbackfp_get_strval(hostptr, "Handle.MainForm", (char*)&mainFarrWindow, sizeof(HWND));
-
-    return mainFarrWindow;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void FarrPlugin::setShowAllMode()
-{
-    callbackfp_set_strval(hostptr, "setshowallmode", "");
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void FarrPlugin::showHtmlFileInternal(const std::string& filePath)
-{
-    const std::string alias = "htmlviewurl file://" + filePath;
-    callbackfp_set_strval(hostptr, "launch", (char*)alias.c_str());
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-std::string FarrPlugin::getPluginAlias()
-{
-    const int MaxLength = 100;
-    char buffer[MaxLength] = { 0 };
-    callbackfp_get_strval(hostptr, "plugin_alias", (char*)&buffer, MaxLength);
-
-    const std::string pluginAlias(buffer);
-    if(pluginAlias.empty())
-    {
-        return ThisPlugin_FARR_DefaultAlias;
-    }
-    else
-    {
-        return pluginAlias;
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void FarrPlugin::signalSearchStateChanged(bool isSearching, FarrItems::size_type itemCount)
-{
-    _isSearching = isSearching;
-
-    callbackfp_notifysearchstatechanged(hostptr, itemCount, isSearching ? E_SearchState_Searching : E_SearchState_Stopped);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
