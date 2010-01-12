@@ -66,37 +66,12 @@ private:
 
     void clearResults();
 
-    // some helper functions
-    void signalSearchStateChanged(bool isSearching, FarrItems::size_type itemCount = 0);
-
     static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasOption);
     static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
     static std::string replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match);
     static std::string replaceVariable(const std::string& text, const std::string& variable, const std::string& value);
 	//static std::string fixLink(const std::string& link, const std::string& searchUrl);
-
-    static void launchFile(const std::string& path);
-    static void setStatusText(const std::string& statusText);
-    static void setNewSearch(const std::string& searchText);
-    static void setShowAllMode();
-    static HWND getFarrMainWindow();
-    static void showHtmlFileInternal(const std::string& filePath);
-    static std::string getPluginAlias();
-
-    class TemporaryStatusText
-    {
-    public:
-        TemporaryStatusText(const std::string& statusText)
-        {
-            setStatusText(statusText);
-        }
-
-        ~TemporaryStatusText()
-        {
-            setStatusText("");
-        }
-    };
 };
 
 ///////////////////////////////////////////////////////////////////////////////
