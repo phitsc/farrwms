@@ -56,10 +56,7 @@ private:
         if(it != collection.end())
         {
             const std::string& value = it->second;
-            if(!value.empty())
-            {
-                return value;
-            }
+            return value;
         }
 
         const Strings::const_iterator it2 = collection.find("");
@@ -78,6 +75,14 @@ private:
     {
         const Bools::const_iterator it = collection.find(optionName);
         return (it != collection.end()) ? it->second : false;
+    }
+
+    static void assignProperty(Strings& properties, const std::string& optionName, const std::string& value)
+    {
+        if(value != "__UNDEF")
+        {
+            properties[optionName] = value;
+        }
     }
 
     std::string _name;
