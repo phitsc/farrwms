@@ -56,18 +56,18 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
     PathAppend(categoryIconPath, std::string("-" + categoryName).c_str());
     PathAddExtension(categoryIconPath, ".ico");
 
-    const std::string pattern = iniFile.getParameterValue(categoryName, "resultPattern", "");
+    const std::string pattern = iniFile.getParameterValue(categoryName, "resultPattern", "__UNDEF");
 
     if(isValidRegularExpression(search.getName(), categoryName, pattern))
     {
         search.addItem(categoryName, 
-                       iniFile.getParameterValue(categoryName, "description", ""),
-                       iniFile.getParameterValue(categoryName, "searchUrl", ""), 
+                       iniFile.getParameterValue(categoryName, "description", "__UNDEF"),
+                       iniFile.getParameterValue(categoryName, "searchUrl", "__UNDEF"), 
                        (iniFile.getParameterValue(categoryName, "isFeed", "false") == "true"),
                        pattern, 
-                       iniFile.getParameterValue(categoryName, "farrCaption", ""),
-                       iniFile.getParameterValue(categoryName, "farrGroup", ""),
-                       iniFile.getParameterValue(categoryName, "farrPath", ""),
+                       iniFile.getParameterValue(categoryName, "farrCaption", "__UNDEF"),
+                       iniFile.getParameterValue(categoryName, "farrGroup", "__UNDEF"),
+                       iniFile.getParameterValue(categoryName, "farrPath", "__UNDEF"),
                        (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
     }
 }
@@ -132,14 +132,14 @@ void Search::addItem(const std::string& optionName,
                      const std::string& farrPath, 
                      const std::string& farrIconPath)
 {
-    _descriptions[optionName] = description;
-	_searchUrls[optionName] = searchUrl;
+    assignProperty(_descriptions, optionName, description);
+	assignProperty(_searchUrls, optionName, searchUrl);
     _isFeeds[optionName] = isFeed;
-	_resultPatterns[optionName] = resultPattern;
-    _farrCaptions[optionName] = farrCaption;
-    _farrGroups[optionName] = farrGroup;
-    _farrPaths[optionName] = farrPath;
-	_farrIconPaths[optionName] = farrIconPath;
+	assignProperty(_resultPatterns, optionName, resultPattern);
+    assignProperty(_farrCaptions, optionName, farrCaption);
+    assignProperty(_farrGroups, optionName, farrGroup);
+    assignProperty(_farrPaths, optionName, farrPath);
+	assignProperty(_farrIconPaths, optionName, farrIconPath);
 
     _optionNames.insert(optionName);
 }
