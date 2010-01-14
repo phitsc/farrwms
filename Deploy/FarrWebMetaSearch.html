@@ -551,7 +551,7 @@ Type {{{ wms ? }}} to open this help file in an external browser.
 [[Credits]]
 [[Disclaimer]]</pre>
 </div>
-<div title="Search config files" modifier="phitsc" created="201001092100" modified="201001092119" changecount="10">
+<div title="Search config files" modifier="phitsc" created="201001092100" modified="201001142113" changecount="11">
 <pre>New searches can be added to the FarrWebMetaSearch plugin by adding search configuration files. Search configuration files have the {{{.config}}} file extension and have to be in the plugin's {{{searches}}} subdirectory.
 
 !Basics
@@ -572,6 +572,11 @@ A basic search configuration file should have the following parameters defined:
 | farrCaption | Caption of result item |
 | farrGroup | Smaller line beneath the caption of the result item |
 | farrPath | URL which is launched when triggering a result item |
+
+!!resultPattern
+The {{{resultPattern}}} defines a regular expression that is applied to the search web page in order to grab the results. The regular expression grammar used is ECMAScript (aka JavaScript).
+
+The search term entered in the FARR find box can be used in the resultPattern as well using the {{{%SEARCHTERM%}}} variable.
 
 !Example
 
@@ -609,9 +614,10 @@ A search defined as a feed will start searching as soon as one enters a space af
 * Make additional links available via context menu entries
 * Add many more searches :)</pre>
 </div>
-<div title="Version history" modifier="phitsc" created="201001082239" modified="201001142059" changecount="14">
-<pre>''1.2.0''
+<div title="Version history" modifier="phitsc" created="201001082239" modified="201001142114" changecount="16">
+<pre>''1.2.0 - 14. January 2010''
 * Fixed bug with search parameters defined as empty string
+* Updated help file [[Search config files]]
 * new / updated searches:
 ** onelook (by Perry Mowbray)
 ** kindleforum (feed)
