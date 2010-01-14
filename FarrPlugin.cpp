@@ -166,11 +166,11 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
     const std::string resultPattern = replaceVariable(_currentSearch->getResultPattern(_currentOptionName), "%SEARCHTERM%", _currentSearchTerm);
 
-    std::stringstream stream;
-    stream << "search term: '" << _currentSearchTerm << "'\n";
-    stream << "regex: '" << resultPattern << "'\n";
+    //std::stringstream stream;
+    //stream << "search term: '" << _currentSearchTerm << "'\n";
+    //stream << "regex: '" << resultPattern << "'\n";
 
-    OutputDebugString(stream.str().c_str());
+    //OutputDebugString(stream.str().c_str());
 
     const std::tr1::regex expression(resultPattern);
     std::tr1::sregex_iterator it(responseText.begin(), responseText.end(), expression);
