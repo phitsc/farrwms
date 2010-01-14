@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <functional> 
+#include <regex>
 
 using namespace std::tr1::placeholders; 
 
@@ -164,7 +165,6 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     clearResults();
 
     const std::string resultPattern = replaceVariable(_currentSearch->getResultPattern(_currentOptionName), "%SEARCHTERM%", _currentSearchTerm);
-    const std::tr1::cregex_iterator::regex_type regexType(resultPattern);
 
     std::stringstream stream;
     stream << "search term: '" << _currentSearchTerm << "'\n";
@@ -172,14 +172,15 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
     OutputDebugString(stream.str().c_str());
 
-    std::tr1::cregex_iterator it(responseText.c_str(), responseText.c_str() + responseText.length(), regexType);
-    std::tr1::cregex_iterator end;
+    const std::tr1::regex expression(resultPattern);
+    std::tr1::sregex_iterator it(responseText.begin(), responseText.end(), expression);
+    std::tr1::sregex_iterator end;
     for( ; it != end; ++it)
     {
-        const std::tr1::cmatch match = *it;
-        const std::string caption = replaceSubexpressions(_currentSearch->getFarrCaption(_currentOptionName), match);
-        const std::string group = replaceSubexpressions(_currentSearch->getFarrGroup(_currentOptionName), match);
-        const std::string url = replaceSubexpressions(_currentSearch->getFarrPath(_currentOptionName), match);
+        const std::tr1::smatch match = *it;
+        const std::string caption = replaceCharacterEntityReferences(match.format(_currentSearch->getFarrCaption(_currentOptionName)));
+        const std::string group = replaceCharacterEntityReferences(match.format(_currentSearch->getFarrGroup(_currentOptionName)));
+        const std::string url = replaceCharacterEntityReferences(match.format(_currentSearch->getFarrPath(_currentOptionName)));
 
         _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath(_currentOptionName), FarrItem::Url));
     }
@@ -386,23 +387,6 @@ std::string FarrPlugin::removeHttp(const std::string& url)
     temp = std::tr1::regex_replace(temp, std::tr1::regex("http://"), std::string(""));
 
     return temp;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-std::string FarrPlugin::replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match)
-{
-    std::string temp(text);
-
-    const std::tr1::cmatch::size_type maxSubexpression = match.size();
-    for(std::tr1::cmatch::size_type index = 1; index <= maxSubexpression; ++index)
-    {
-        std::stringstream stream;
-        stream << "\\$" << index;
-        temp = std::tr1::regex_replace(temp, std::tr1::regex(stream.str()), match[index].str());
-    }
-
-    return replaceCharacterEntityReferences(temp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
