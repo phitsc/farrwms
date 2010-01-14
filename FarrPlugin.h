@@ -7,7 +7,6 @@
 #include "XmlHttpRequestEvents.h"
 
 #include <string>
-#include <regex>
 #include <windows.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,7 +68,6 @@ private:
     static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasOption);
     static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
-    static std::string replaceSubexpressions(const std::string& text, const std::tr1::cmatch& match);
     static std::string replaceVariable(const std::string& text, const std::string& variable, const std::string& value);
 	//static std::string fixLink(const std::string& link, const std::string& searchUrl);
 };
