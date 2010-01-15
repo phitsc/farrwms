@@ -7,6 +7,7 @@
 #include "XmlHttpRequestEvents.h"
 
 #include <string>
+#include <map>
 #include <windows.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,6 +53,7 @@ private:
 
     // XmlHttpRequestEvents
     virtual void onHttpRequestResponse(const std::string& response);
+    virtual void onHttpRequestFailed(const std::string& statusText);
 
     //
     std::string _farrAlias;
@@ -65,10 +67,13 @@ private:
 
     void clearResults();
 
+    typedef std::map<std::string, std::string> Variables;
+
     static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasOption);
     static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
-    static std::string replaceVariable(const std::string& text, const std::string& variable, const std::string& value);
+    static void        replaceVariable(std::string& text, const Variables::value_type& variableAndValue);
+    static std::string replaceVariables(const std::string& text, const Variables& variables);
 	//static std::string fixLink(const std::string& link, const std::string& searchUrl);
 };
 

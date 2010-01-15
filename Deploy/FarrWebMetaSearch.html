@@ -604,18 +604,25 @@ A search defined as a feed will start searching as soon as one enters a space af
 <div title="SiteTitle" modifier="phitsc" created="201001082227" changecount="1">
 <pre>FarrWebMetaSearch</pre>
 </div>
-<div title="Todo" modifier="phitsc" created="201001082301" modified="201001131350" changecount="3">
+<div title="Todo" modifier="phitsc" created="201001082301" modified="201001151410" changecount="4">
 <pre>* Fix icon copyright problem
 * Improve help file. Especially, extend [[Search config files]] topic
 * Add a way for users to contribute / get searches
 * Add logging / notification in case a configuration files is invalid
-* Make original search string available as a variable in output
+* --Make original search string available as a variable in output--
 * Allow entering search option after the search terms
 * Make additional links available via context menu entries
 * Add many more searches :)</pre>
 </div>
-<div title="Version history" modifier="phitsc" created="201001082239" modified="201001142114" changecount="16">
-<pre>''1.2.0 - 14. January 2010''
+<div title="Version history" modifier="phitsc" created="201001082239" modified="201001151432" changecount="21">
+<pre>''1.3.0''
+* search term ({{{%SEARCHTERM%}}}) and search URL ({{{%SEARCHURL%}}}) are now available as variables in the resultPattern, farrPath, farrCaption and farrGroup parameters
+* search term ({{{%SEARCHTERM%}}}) is now available as a variable in the searchUrl parameter. If searchUrl does not contain the {{{%SEARCHTERM%}}} variable, the search term is appended at the end (as it was until now)
+* properly handle and report server errors
+* new / updated searches:
+** onelook (by Perry Mowbray) - added name subsearch
+
+''1.2.0 - 14. January 2010''
 * Fixed bug with search parameters defined as empty string
 * Updated help file [[Search config files]]
 * new / updated searches:

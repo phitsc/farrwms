@@ -9,6 +9,7 @@
 struct XmlHttpRequestEvents
 {
     virtual void onHttpRequestResponse(const std::string& response) = 0;
+    virtual void onHttpRequestFailed(const std::string& statusText) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

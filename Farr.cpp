@@ -53,6 +53,13 @@ void reportError(const std::string& errorText)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void displayAlertMessage(const std::string& text)
+{
+    callbackfp_set_strval(hostptr, "DisplayAlertMessage", (TCHAR*)text.c_str());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool signalSearchStateChanged(bool isSearching, unsigned long itemCount)
 {
     callbackfp_notifysearchstatechanged(hostptr, itemCount, isSearching ? E_SearchState_Searching : E_SearchState_Stopped);
