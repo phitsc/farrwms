@@ -31,10 +31,21 @@ void setNewSearch(const std::string& searchText)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void addStatusBarMenuItem(const std::string& caption, const std::string& hint, const std::string& launchCommand)
+void addStatusBarMenuItem(const std::string& caption, const std::string& hint, const std::string& icon, const std::string& launchCommand)
 {
-    const std::string menuStrings = "type=item|caption=" + caption + "|hint=" + hint + "|launch=" + launchCommand;
+    const std::string menuStrings = "type=item|caption=" + caption + "|icon=" + icon + "|hint=" + hint + "|launch=" + launchCommand;
     callbackfp_set_strval(hostptr, "addmenu.statusbar", (char*)menuStrings.c_str());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+long getMaxResults()
+{
+    const int BufferLength = 100;
+    char buffer[BufferLength] = { 0 };
+    callbackfp_get_strval(hostptr, "resolve:%MAXRESULTSDEF%", (char*)buffer, BufferLength);
+    
+    return atoi(buffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
