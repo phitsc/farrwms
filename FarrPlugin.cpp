@@ -112,7 +112,12 @@ void FarrPlugin::search(const char* rawSearchString)
                 {
                     if(!_currentSearchTerm.empty())
                     {
-                        const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm;
+                        const bool containsSearchTermVariable = (_currentSearch->getSearchUrl(_currentOptionName).find("%SEARCHTERM%") != std::string::npos);
+
+                        Variables variables;
+                        variables["%SEARCHTERM%"] = _currentSearchTerm;
+
+                        const std::string searchUrl = containsSearchTermVariable ? replaceVariables(_currentSearch->getSearchUrl(_currentOptionName), variables) : (_currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm);
 
                         _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                         _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
@@ -164,7 +169,11 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 {
     clearResults();
 
-    const std::string resultPattern = replaceVariable(_currentSearch->getResultPattern(_currentOptionName), "%SEARCHTERM%", _currentSearchTerm);
+    Variables variables;
+    variables["%SEARCHTERM%"] = _currentSearchTerm;
+    variables["%SEARCHURL%"] = replaceVariables(_currentSearch->getSearchUrl(_currentOptionName), variables);
+
+    const std::string resultPattern = replaceVariables(_currentSearch->getResultPattern(_currentOptionName), variables);
 
     //std::stringstream stream;
     //stream << "search term: '" << _currentSearchTerm << "'\n";
@@ -178,14 +187,27 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     for( ; it != end; ++it)
     {
         const std::tr1::smatch match = *it;
-        const std::string caption = replaceCharacterEntityReferences(match.format(_currentSearch->getFarrCaption(_currentOptionName)));
-        const std::string group = replaceCharacterEntityReferences(match.format(_currentSearch->getFarrGroup(_currentOptionName)));
-        const std::string url = replaceCharacterEntityReferences(match.format(_currentSearch->getFarrPath(_currentOptionName)));
+
+        const std::string caption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getFarrCaption(_currentOptionName), variables)));
+        const std::string group = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getFarrGroup(_currentOptionName), variables)));
+        const std::string url = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getFarrPath(_currentOptionName), variables)));
 
         _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath(_currentOptionName), FarrItem::Url));
     }
 
     _farrItemCache = _farrItems;
+
+    _isSearching = farr::signalSearchStateChanged(false, getItemCount());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::onHttpRequestFailed(const std::string& statusText)
+{
+    clearResults();
+
+    const std::string errorText = "FarrWebMetaSearch Error!\n" + statusText;
+    farr::displayAlertMessage(errorText);
 
     _isSearching = farr::signalSearchStateChanged(false, getItemCount());
 }
@@ -391,9 +413,18 @@ std::string FarrPlugin::removeHttp(const std::string& url)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-std::string FarrPlugin::replaceVariable(const std::string& text, const std::string& variable, const std::string& value)
+void FarrPlugin::replaceVariable(std::string& text, const Variables::value_type& variableAndValue)
 {
-    return std::tr1::regex_replace(text, std::tr1::regex(variable), value);
+    text = std::tr1::regex_replace(text, std::tr1::regex(variableAndValue.first), variableAndValue.second);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string FarrPlugin::replaceVariables(const std::string& text, const Variables& variables)
+{
+    std::string temp(text);
+    std::for_each(variables.begin(), variables.end(), std::tr1::bind(&FarrPlugin::replaceVariable, std::tr1::ref(temp), _1));
+    return temp;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

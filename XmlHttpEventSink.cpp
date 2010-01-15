@@ -98,6 +98,13 @@ STDMETHODIMP XmlHttpEventSink::Invoke(DISPID /*dispIdMember*/, REFIID /*riid*/, 
 
             _xmlHttpRequestEvents.onHttpRequestResponse(static_cast<const char*>(responseText));
         }
+        else if(status >= 400)
+        {
+            _bstr_t statusText;
+            _request->get_statusText(statusText.GetAddress());
+
+            _xmlHttpRequestEvents.onHttpRequestFailed(static_cast<const char*>(statusText));
+        }
     }
     return S_OK;
 }
