@@ -197,6 +197,11 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
     _farrItemCache = _farrItems;
 
+    if((long)_farrItems.size() > farr::getMaxResults())
+    {
+        farr::addStatusBarMenuItem("Show more results", "Show more results", _iconPath + "Down_small.ico", "dosearch " + _farrAlias + "!showAllItems");
+    }
+
     _isSearching = farr::signalSearchStateChanged(false, getItemCount());
 }
 
@@ -323,6 +328,11 @@ bool FarrPlugin::processCommand(const std::string& searchString)
             listAboutItems();
 
             return true;
+        }
+        else if(searchString.find("!showAllItems") == 0)
+        {
+            farr::setShowAllMode();
+            listCachedItems("");
         }
     }
 

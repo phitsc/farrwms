@@ -13,7 +13,9 @@ namespace farr
     void setStatusText(const std::string& statusText);
     void reportError(const std::string& errorText);
     void displayAlertMessage(const std::string& text);
-    void addStatusBarMenuItem(const std::string& caption, const std::string& hint, const std::string& command);
+    void addStatusBarMenuItem(const std::string& caption, const std::string& hint, const std::string& icon, const std::string& command);
+    long getMaxResults();
+
     bool signalSearchStateChanged(bool isSearching, unsigned long itemCount = 0);
 
     HWND getFarrMainWindow();
