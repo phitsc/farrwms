@@ -60,15 +60,16 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
 
     if(isValidRegularExpression(search.getName(), categoryName, pattern))
     {
-        search.addItem(categoryName, 
-                       iniFile.getParameterValue(categoryName, "description", "__UNDEF"),
-                       iniFile.getParameterValue(categoryName, "searchUrl", "__UNDEF"), 
-                       (iniFile.getParameterValue(categoryName, "isFeed", "false") == "true"),
-                       pattern, 
-                       iniFile.getParameterValue(categoryName, "farrCaption", "__UNDEF"),
-                       iniFile.getParameterValue(categoryName, "farrGroup", "__UNDEF"),
-                       iniFile.getParameterValue(categoryName, "farrPath", "__UNDEF"),
-                       (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
+        Search::Parameters& parameters = search.addOption(categoryName);
+        assignProperty(parameters, "description", iniFile.getParameterValue(categoryName, "description", "__UNDEF"));
+        assignProperty(parameters, "contributor", iniFile.getParameterValue(categoryName, "contributor", "__UNDEF"));
+        assignProperty(parameters, "searchUrl", iniFile.getParameterValue(categoryName, "searchUrl", "__UNDEF"));
+        assignProperty(parameters, "isFeed", iniFile.getParameterValue(categoryName, "isFeed", "false"));
+        assignProperty(parameters, "resultPattern", pattern);
+        assignProperty(parameters, "farrCaption", iniFile.getParameterValue(categoryName, "farrCaption", "__UNDEF"));
+        assignProperty(parameters, "farrGroup", iniFile.getParameterValue(categoryName, "farrGroup", "__UNDEF"));
+        assignProperty(parameters, "farrPath", iniFile.getParameterValue(categoryName, "farrPath", "__UNDEF"));
+        assignProperty(parameters, "farrIconPath", (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
     }
 }
 
@@ -122,26 +123,10 @@ Search::Search(const std::string& name) :
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Search::addItem(const std::string& optionName,
-                     const std::string& description,
-                     const std::string& searchUrl, 
-                     bool				isFeed,
-                     const std::string& resultPattern, 
-                     const std::string& farrCaption, 
-                     const std::string& farrGroup, 
-                     const std::string& farrPath, 
-                     const std::string& farrIconPath)
+Search::Parameters& Search::addOption(const std::string& optionName)
 {
-    assignProperty(_descriptions, optionName, description);
-	assignProperty(_searchUrls, optionName, searchUrl);
-    _isFeeds[optionName] = isFeed;
-	assignProperty(_resultPatterns, optionName, resultPattern);
-    assignProperty(_farrCaptions, optionName, farrCaption);
-    assignProperty(_farrGroups, optionName, farrGroup);
-    assignProperty(_farrPaths, optionName, farrPath);
-	assignProperty(_farrIconPaths, optionName, farrIconPath);
-
     _optionNames.insert(optionName);
+    return _options[optionName];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,6 +137,93 @@ bool Search::hasName(const std::string& name) const
 	util::String::tolower(temp);
 
 	return (_name == temp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+const std::string& Search::getParameter(const std::string& optionName, const std::string& parameterName) const
+{
+    {
+        const Options::const_iterator it = _options.find(optionName);
+        if(it != _options.end())
+        {
+            const Parameters& parameters = it->second;
+
+            const Parameters::const_iterator it2 = parameters.find(parameterName);
+            if(it2 != parameters.end())
+            {
+                const std::string& value = it2->second;
+                return value;
+            }
+        }
+    }
+
+    {
+        const Options::const_iterator it = _options.find("");
+        if(it != _options.end())
+        {
+            const Parameters& parameters = it->second;
+
+            const Parameters::const_iterator it2 = parameters.find(parameterName);
+            if(it2 != parameters.end())
+            {
+                const std::string& value = it2->second;
+                return value;
+            }
+        }
+    }
+
+    static std::string empty;
+    return empty;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+const std::string Search::getInfoAsHtml() const
+{
+    std::stringstream stream;
+    stream << "<body><h2>" << _name << "</h2>";
+    
+    const std::string& contributor = getParameter("", "contributor");
+    if(!contributor.empty())
+    {
+        stream << "<i>by " << contributor << "</i></br></br>";
+    }
+
+    stream << getParameter("", "description");
+
+    if(_optionNames.size() > 1)
+    {
+        stream << "<h3>Subsearches</h3>";
+        stream << "<ul>";
+        std::for_each(_optionNames.begin(), _optionNames.end(), std::tr1::bind(&Search::getOptionInfoAsHtml, this, _1, std::tr1::ref(stream)));
+        stream << "</ul>";
+    }
+
+    return stream.str();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Search::getOptionInfoAsHtml(const std::string& optionName, std::stringstream& stream) const
+{
+    if(!optionName.empty())
+    {
+        stream << "<li><i>" << optionName << "</i>";
+
+        const Options::const_iterator it = _options.find(optionName);
+        if(it != _options.end())
+        {
+            const Parameters& parameters = it->second;
+            const Parameters::const_iterator it2 = parameters.find("description");
+            if(it2 != parameters.end())
+            {
+                stream << ": " << it2->second; 
+            }
+        }
+
+        stream << "</li>";
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,8 @@
 #include <functional> 
 #include <regex>
 
+#include <shlwapi.h>
+
 using namespace std::tr1::placeholders; 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,8 +19,9 @@ FarrPlugin::FarrPlugin(const std::string& modulePath) :
     _isSearching(false),
     _iconPath(modulePath + "\\icons\\"),
     _helpFile(modulePath + "\\" + farr::getReadMeFileName()),
-	_searches(modulePath + "\\searches\\")
-{
+	_searches(modulePath + "\\searches\\"),
+    _searchesPath(modulePath + "\\searches\\")
+    {
     _xmlHttpRequest.CreateInstance(L"Msxml2.XMLHTTP.3.0");
 
     _xmlHttpEventSink = new XmlHttpEventSink(_xmlHttpRequest, *this);
@@ -51,6 +54,28 @@ FarrItems::size_type FarrPlugin::getItemCount() const
 const FarrItem& FarrPlugin::getItem(const FarrItems::size_type& index) const
 {
     return _farrItems[index];
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::showSearchInfo(const std::string& searchName)
+{
+    Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&Search::hasName, _1, searchName));
+    if(it != _searches.end())
+    {
+        const Search& search = *it;
+
+        const std::string infoFileName = _searchesPath + search.getName() + ".html";
+        if(PathFileExists(infoFileName.c_str()))
+        {
+            farr::showLocalHtmlFile(infoFileName);
+        }
+        else
+        {
+            const std::string searchInfoAsHtml = search.getInfoAsHtml();
+            farr::showHtml(searchInfoAsHtml);
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,14 +113,14 @@ void FarrPlugin::search(const char* rawSearchString)
 		    {
 			    _currentSearch = &(*it);
 
-                const bool isFeed = _currentSearch->getIsFeed(_currentOptionName);
+                const bool isFeed = (_currentSearch->getParameter(_currentOptionName, "isFeed") == "true");
                 if(isFeed)
                 {
                     if(_currentSearchTerm.empty())
                     {
                         _farrItemCache.clear();
 
-                        const std::string searchUrl = _currentSearch->getSearchUrl(_currentOptionName);
+                        const std::string searchUrl = _currentSearch->getParameter(_currentOptionName, "searchUrl");
 
                         _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                         _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
@@ -112,12 +137,12 @@ void FarrPlugin::search(const char* rawSearchString)
                 {
                     if(!_currentSearchTerm.empty())
                     {
-                        const bool containsSearchTermVariable = (_currentSearch->getSearchUrl(_currentOptionName).find("%SEARCHTERM%") != std::string::npos);
+                        const bool containsSearchTermVariable = (_currentSearch->getParameter(_currentOptionName, "searchUrl").find("%SEARCHTERM%") != std::string::npos);
 
                         Variables variables;
                         variables["%SEARCHTERM%"] = _currentSearchTerm;
 
-                        const std::string searchUrl = containsSearchTermVariable ? replaceVariables(_currentSearch->getSearchUrl(_currentOptionName), variables) : (_currentSearch->getSearchUrl(_currentOptionName) + _currentSearchTerm);
+                        const std::string searchUrl = containsSearchTermVariable ? replaceVariables(_currentSearch->getParameter(_currentOptionName, "searchUrl"), variables) : (_currentSearch->getParameter(_currentOptionName, "searchUrl") + _currentSearchTerm);
 
                         _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                         _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
@@ -139,6 +164,10 @@ void FarrPlugin::search(const char* rawSearchString)
             if(hasSpaceAfterAlias && searchString.empty())
             {
                 farr::setStatusText("Type ? and hit enter to show help file.");
+            }
+            else
+            {
+                farr::setStatusText("Hit Shift + Enter to display info about search.");
             }
         }
     }
@@ -171,9 +200,9 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
     Variables variables;
     variables["%SEARCHTERM%"] = _currentSearchTerm;
-    variables["%SEARCHURL%"] = replaceVariables(_currentSearch->getSearchUrl(_currentOptionName), variables);
+    variables["%SEARCHURL%"] = replaceVariables(_currentSearch->getParameter(_currentOptionName, "searchUrl"), variables);
 
-    const std::string resultPattern = replaceVariables(_currentSearch->getResultPattern(_currentOptionName), variables);
+    const std::string resultPattern = replaceVariables(_currentSearch->getParameter(_currentOptionName, "resultPattern"), variables);
 
     //std::stringstream stream;
     //stream << "search term: '" << _currentSearchTerm << "'\n";
@@ -188,11 +217,11 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     {
         const std::tr1::smatch match = *it;
 
-        const std::string caption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getFarrCaption(_currentOptionName), variables)));
-        const std::string group = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getFarrGroup(_currentOptionName), variables)));
-        const std::string url = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getFarrPath(_currentOptionName), variables)));
+        const std::string caption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "farrCaption"), variables)));
+        const std::string group = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "farrGroup"), variables)));
+        const std::string url = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "farrPath"), variables)));
 
-        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getFarrIconPath(_currentOptionName), FarrItem::Url));
+        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getParameter(_currentOptionName, "farrIconPath"), FarrItem::Url));
     }
 
     _farrItemCache = _farrItems;
@@ -259,7 +288,7 @@ void FarrPlugin::addSearchToResults(const Search& search, const std::string& fil
 
     if(filter.empty() || util::String::containsSubstringNoCase(searchName, filter))
     {
-        _farrItems.push_back(FarrItem(searchName, search.getDescription(""), _farrAlias + search.getName(), search.getFarrIconPath(""), FarrItem::Alias));
+        _farrItems.push_back(FarrItem(searchName, search.getParameter("", "description"), _farrAlias + search.getName(), search.getParameter("", "farrIconPath"), FarrItem::Alias));
     }
 }
 
@@ -290,10 +319,10 @@ void FarrPlugin::listCachedItems(const std::string& filter)
 
 void FarrPlugin::addOptionToResults(const Search& search, const std::string& optionName, const std::string& filter)
 {
-    if(filter.empty() || util::String::containsSubstringNoCase(optionName, filter))
+    if(!optionName.empty() && (filter.empty() || util::String::containsSubstringNoCase(optionName, filter)))
     {
-        const std::string caption = search.getName() + " - " + optionName;
-        _farrItems.push_back(FarrItem(caption, search.getDescription(optionName), _farrAlias + search.getName() + " +" + optionName, search.getFarrIconPath(optionName), FarrItem::Alias));
+        const std::string caption = search.getName() + " +" + optionName;
+        _farrItems.push_back(FarrItem(caption, search.getParameter(optionName, "description"), _farrAlias + search.getName() + " +" + optionName, search.getParameter(optionName, "farrIconPath"), FarrItem::Alias));
     }
 }
 

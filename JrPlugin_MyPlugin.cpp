@@ -478,7 +478,7 @@ PREFUNCDEF BOOL EFuncName_Request_LockResults(BOOL dolock)
 //
 // Returns TRUE on success
 //
-PREFUNCDEF BOOL EFuncName_Request_ItemResultByIndex(int resultindex, char* destbuf_path, char* destbuf_caption, char* destbuf_groupname, char* destbuf_iconfilename, void** /*tagvoidpp*/, int maxlen, E_ResultPostProcessingT* resultpostprocmodep, int* /*scorep*/, E_EntryTypeT* entrytypep)
+PREFUNCDEF BOOL EFuncName_Request_ItemResultByIndex(int resultindex, char* destbuf_path, char* destbuf_caption, char* destbuf_groupname, char* destbuf_iconfilename, void** tagvoidpp, int maxlen, E_ResultPostProcessingT* resultpostprocmodep, int* /*scorep*/, E_EntryTypeT* entrytypep)
 {
     // how result is handled
     // return E_ResultPostProcessing_ImmediateDisplay if we have done the filtering and the result should be displayed
@@ -500,7 +500,7 @@ PREFUNCDEF BOOL EFuncName_Request_ItemResultByIndex(int resultindex, char* destb
     util::String::copyString(destbuf_path, maxlen, item.path);
     util::String::copyString(destbuf_groupname, maxlen, item.group);
     util::String::copyString(destbuf_iconfilename, maxlen, item.iconPath);
-    //*tagvoidpp = item.command.get();
+    *tagvoidpp = (void*)(item.entryType == FarrItem::Alias) ? new std::string(item.caption) : 0;
 
 
     // ok filled one
@@ -535,11 +535,11 @@ PREFUNCDEF BOOL EFuncName_Request_TextResultCharp(char **charp)
 // Return TRUE to takeover launching and prevent all other further launching
 // or FALSE to continue launching after we return
 //
-PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT entrytype, void* /*tagvoidp*/, BOOL* closeafterp)
+PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT entrytype, void* tagvoidp, BOOL* closeafterp)
 {
     if(thispluginid == pluginid)
     {
-        //bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
+        bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
 
         std::string path(destbuf_path); 
 
@@ -552,9 +552,18 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const c
             {
                 *closeafterp = FALSE;
 
-                path += " ";
+                if(!shiftPressed)
+                {
+                    path += " ";
 
-                callbackfp_set_strval(hostptr, "setsearch", (char*)path.c_str());
+                    callbackfp_set_strval(hostptr, "setsearch", (char*)path.c_str());
+                }
+                else
+                {
+                    const std::string* searchName = reinterpret_cast<std::string*>(tagvoidp);
+                    farrPlugin->showSearchInfo(*searchName);
+                    delete searchName;
+                }
 
                 return TRUE;
             }
