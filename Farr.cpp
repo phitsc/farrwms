@@ -24,6 +24,14 @@ void showLocalHtmlFile(const std::string& filePath)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void showHtml(const std::string& html)
+{
+    const std::string alias = "showhtml " + html;
+    callbackfp_set_strval(hostptr, "launch", (char*)alias.c_str());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void setNewSearch(const std::string& searchText)
 {
     callbackfp_set_strval(hostptr, "setsearch", (char*)searchText.c_str());

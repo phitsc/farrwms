@@ -9,6 +9,7 @@ namespace farr
 {
     void setShowAllMode();
     void showLocalHtmlFile(const std::string& filePath);
+    void showHtml(const std::string& html);
     void setNewSearch(const std::string& searchText);
     void setStatusText(const std::string& statusText);
     void reportError(const std::string& errorText);

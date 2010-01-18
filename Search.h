@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -16,28 +17,15 @@ class Search
 public:
 	Search(const std::string& name);
 
-    void addItem(const std::string& optionName,
-                 const std::string& description,
-                 const std::string& searchUrl,
-				 bool				isFeed,
-                 const std::string& resultPattern, 
-                 const std::string& farrCaption, 
-                 const std::string& farrGroup, 
-                 const std::string& farrPath, 
-                 const std::string& farrIconPath);
+    typedef std::map<std::string, std::string> Parameters;
+
+    Parameters& addOption(const std::string& optionName);
 
 	bool hasName(const std::string& name) const;
 
     const std::string& getName() const { return _name; }
-
-    const std::string& getDescription(const std::string& optionName) const { return getItem(optionName, _descriptions); }
-	const std::string& getSearchUrl(const std::string& optionName) const { return getItem(optionName, _searchUrls); }
-    bool		       getIsFeed(const std::string& optionName) const { return getItem(optionName, _isFeeds); }
-	const std::string& getResultPattern(const std::string& optionName) const { return getItem(optionName, _resultPatterns); }
-	const std::string& getFarrCaption(const std::string& optionName) const { return getItem(optionName, _farrCaptions); }
-	const std::string& getFarrGroup(const std::string& optionName) const { return getItem(optionName, _farrGroups); }
-	const std::string& getFarrPath(const std::string& optionName) const { return getItem(optionName, _farrPaths); }
-	const std::string& getFarrIconPath(const std::string& optionName) const { return getItem(optionName, _farrIconPaths); }
+    const std::string& getParameter(const std::string& optionName, const std::string& parameterName) const;
+    const std::string getInfoAsHtml() const;
 
     typedef std::set<std::string> OptionNames;
 
@@ -47,54 +35,12 @@ public:
     OptionNamesConstIterator optionNamesEnd() const { return _optionNames.end(); }
 
 private:
-    typedef std::map<std::string, std::string> Strings;
-	typedef std::map<std::string, bool> Bools;
+    void getOptionInfoAsHtml(const std::string& optionName, std::stringstream& stream) const;
 
-    const std::string& getItem(const std::string& optionName, const Strings& collection) const
-    {
-        const Strings::const_iterator it = collection.find(optionName);
-        if(it != collection.end())
-        {
-            const std::string& value = it->second;
-            return value;
-        }
-
-        const Strings::const_iterator it2 = collection.find("");
-        if(it2 != collection.end())
-        {
-            return it2->second;
-        }
-        else
-        {
-            static std::string empty;
-            return empty;
-        }
-    }
-
-    bool getItem(const std::string& optionName, const Bools& collection) const
-    {
-        const Bools::const_iterator it = collection.find(optionName);
-        return (it != collection.end()) ? it->second : false;
-    }
-
-    static void assignProperty(Strings& properties, const std::string& optionName, const std::string& value)
-    {
-        if(value != "__UNDEF")
-        {
-            properties[optionName] = value;
-        }
-    }
+    typedef std::map<std::string, Parameters> Options;
 
     std::string _name;
-    Strings _descriptions;
-	Strings _searchUrls;
-	Bools   _isFeeds;
-	Strings _resultPatterns;
-	Strings _farrCaptions;
-	Strings _farrGroups;
-	Strings _farrPaths;
-	Strings _farrIconPaths;
-
+    Options     _options;
     OptionNames _optionNames;
 };
 
@@ -116,6 +62,14 @@ private:
     static void addItemToSearch(Search& search, const IniFile& iniFile, const std::string& categoryName, const std::string& iconPath);
     static bool isValidRegularExpression(const std::string& searchName, const std::string& categoryName, const std::string& pattern);
 	static std::string findIconPath(const std::string& searchFile);
+
+    static void assignProperty(Search::Parameters& parameters, const std::string& parameterName, const std::string& value)
+    {
+        if(value != "__UNDEF")
+        {
+            parameters[parameterName] = value;
+        }
+    }
 
 	SearchCollection _searches;
 };

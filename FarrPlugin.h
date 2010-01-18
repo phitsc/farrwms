@@ -26,6 +26,8 @@ public:
     FarrItems::size_type getItemCount() const;
     const FarrItem& getItem(const FarrItems::size_type& index) const;
 
+    void showSearchInfo(const std::string& searchName);
+
     const std::string& getAlias() const { return _farrAlias; }
 
 private:
@@ -58,6 +60,7 @@ private:
     //
     std::string _farrAlias;
     std::string _iconPath;
+    std::string _searchesPath;
     std::string _helpFile;
 
     // task vector for item retrieval by FARR 
