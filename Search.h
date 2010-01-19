@@ -19,7 +19,7 @@ public:
 
     typedef std::map<std::string, std::string> Parameters;
 
-    Parameters& addOption(const std::string& optionName);
+    Parameters& addOption(const std::string& optionName, const std::string& abbreviation);
 
 	bool hasName(const std::string& name) const;
 
@@ -29,19 +29,43 @@ public:
 
     typedef std::set<std::string> OptionNames;
 
-    typedef OptionNames::const_iterator OptionNamesConstIterator;
+    struct Option
+    {
+        Option(const std::string& name_, const std::string& abbreviation_) : name(name_), abbreviation(abbreviation_)
+        {}
 
-    OptionNamesConstIterator optionNamesBegin() const { return _optionNames.begin(); }
-    OptionNamesConstIterator optionNamesEnd() const { return _optionNames.end(); }
+        bool operator<(const Option& option) const
+        {
+            return (name < option.name);
+        }
+
+        bool equalsName(const std::string& optionName) const
+        {
+            return (name == optionName);
+        }
+
+        bool equalsNameOrAbbreviation(const std::string& optionNameOrAbbreviation) const
+        {
+            return ((name == optionNameOrAbbreviation) || (abbreviation == optionNameOrAbbreviation));
+        }
+
+        std::string name;
+        std::string abbreviation;
+
+        Parameters parameters;
+    };
+
+    typedef std::set<Option> Options;
+    typedef Options::const_iterator OptionsConstIterator;
+
+    OptionsConstIterator optionsBegin() const { return _options.begin(); }
+    OptionsConstIterator optionsEnd() const { return _options.end(); }
 
 private:
-    void getOptionInfoAsHtml(const std::string& optionName, std::stringstream& stream) const;
-
-    typedef std::map<std::string, Parameters> Options;
+    void getOptionInfoAsHtml(const Option& option, std::stringstream& stream) const;
 
     std::string _name;
     Options     _options;
-    OptionNames _optionNames;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +84,7 @@ public:
 private:
 	void addSearch(const std::string& searchFile);
     static void addItemToSearch(Search& search, const IniFile& iniFile, const std::string& categoryName, const std::string& iconPath);
-    static bool isValidRegularExpression(const std::string& searchName, const std::string& categoryName, const std::string& pattern);
+    static bool isValidRegularExpression(const std::string& searchName, const std::string& optionName, const std::string& pattern);
 	static std::string findIconPath(const std::string& searchFile);
 
     static void assignProperty(Search::Parameters& parameters, const std::string& parameterName, const std::string& value)
