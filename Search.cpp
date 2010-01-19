@@ -50,17 +50,21 @@ void Searches::addSearch(const std::string& searchFile)
 
 void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std::string& categoryName, const std::string& iconPath)
 {
+    const std::string::size_type pos = categoryName.find('|');
+    const std::string optionName = (pos == std::string::npos) ? categoryName : categoryName.substr(0, pos);
+    const std::string abbreviation = (pos == std::string::npos) ? "" : categoryName.substr(pos + 1);
+
     char categoryIconPath[MAX_PATH];
     PathAppend(categoryIconPath, iconPath.c_str());
     PathRemoveExtension(categoryIconPath);
-    PathAppend(categoryIconPath, std::string("-" + categoryName).c_str());
+    PathAppend(categoryIconPath, std::string("-" + optionName).c_str());
     PathAddExtension(categoryIconPath, ".ico");
 
     const std::string pattern = iniFile.getParameterValue(categoryName, "resultPattern", "__UNDEF");
 
-    if(isValidRegularExpression(search.getName(), categoryName, pattern))
+    if(isValidRegularExpression(search.getName(), optionName, pattern))
     {
-        Search::Parameters& parameters = search.addOption(categoryName);
+        Search::Parameters& parameters = search.addOption(optionName, abbreviation);
         assignProperty(parameters, "description", iniFile.getParameterValue(categoryName, "description", "__UNDEF"));
         assignProperty(parameters, "contributor", iniFile.getParameterValue(categoryName, "contributor", "__UNDEF"));
         assignProperty(parameters, "searchUrl", iniFile.getParameterValue(categoryName, "searchUrl", "__UNDEF"));
@@ -91,7 +95,7 @@ std::string Searches::findIconPath(const std::string& searchFile)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool Searches::isValidRegularExpression(const std::string& searchName, const std::string& categoryName, const std::string& pattern)
+bool Searches::isValidRegularExpression(const std::string& searchName, const std::string& optionName, const std::string& pattern)
 {
     try 
     { 
@@ -100,7 +104,7 @@ bool Searches::isValidRegularExpression(const std::string& searchName, const std
     catch(const std::tr1::regex_error& e) 
     { 
         std::stringstream stream;
-        stream << searchName << " [" << categoryName << "]. Invalid Regular Expression. " << e.what() << " (" << e.code() << ")" << std::endl;
+        stream << searchName << " [" << optionName << "]. Invalid Regular Expression. " << e.what() << " (" << e.code() << ")" << std::endl;
 
         OutputDebugString(stream.str().c_str());
 
@@ -123,10 +127,9 @@ Search::Search(const std::string& name) :
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Search::Parameters& Search::addOption(const std::string& optionName)
+Search::Parameters& Search::addOption(const std::string& optionName, const std::string& abbreviation)
 {
-    _optionNames.insert(optionName);
-    return _options[optionName];
+    return _options.insert(Option(optionName, abbreviation)).first->parameters;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -144,10 +147,10 @@ bool Search::hasName(const std::string& name) const
 const std::string& Search::getParameter(const std::string& optionName, const std::string& parameterName) const
 {
     {
-        const Options::const_iterator it = _options.find(optionName);
+        const Options::const_iterator it = std::find_if(_options.begin(), _options.end(), std::tr1::bind(&Option::equalsNameOrAbbreviation, _1, optionName));
         if(it != _options.end())
         {
-            const Parameters& parameters = it->second;
+            const Parameters& parameters = it->parameters;
 
             const Parameters::const_iterator it2 = parameters.find(parameterName);
             if(it2 != parameters.end())
@@ -159,10 +162,10 @@ const std::string& Search::getParameter(const std::string& optionName, const std
     }
 
     {
-        const Options::const_iterator it = _options.find("");
+        const Options::const_iterator it = std::find_if(_options.begin(), _options.end(), std::tr1::bind(&Option::equalsName, _1, ""));
         if(it != _options.end())
         {
-            const Parameters& parameters = it->second;
+            const Parameters& parameters = it->parameters;
 
             const Parameters::const_iterator it2 = parameters.find(parameterName);
             if(it2 != parameters.end())
@@ -192,11 +195,11 @@ const std::string Search::getInfoAsHtml() const
 
     stream << getParameter("", "description");
 
-    if(_optionNames.size() > 1)
+    if(_options.size() > 1)
     {
         stream << "<h3>Subsearches</h3>";
         stream << "<ul>";
-        std::for_each(_optionNames.begin(), _optionNames.end(), std::tr1::bind(&Search::getOptionInfoAsHtml, this, _1, std::tr1::ref(stream)));
+        std::for_each(_options.begin(), _options.end(), std::tr1::bind(&Search::getOptionInfoAsHtml, this, _1, std::tr1::ref(stream)));
         stream << "</ul>";
     }
 
@@ -205,21 +208,22 @@ const std::string Search::getInfoAsHtml() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Search::getOptionInfoAsHtml(const std::string& optionName, std::stringstream& stream) const
+void Search::getOptionInfoAsHtml(const Option& option, std::stringstream& stream) const
 {
-    if(!optionName.empty())
+    if(!option.name.empty())
     {
-        stream << "<li><i>" << optionName << "</i>";
-
-        const Options::const_iterator it = _options.find(optionName);
-        if(it != _options.end())
+        stream << "<li><i>" << option.name;
+        if(!option.abbreviation.empty())
         {
-            const Parameters& parameters = it->second;
-            const Parameters::const_iterator it2 = parameters.find("description");
-            if(it2 != parameters.end())
-            {
-                stream << ": " << it2->second; 
-            }
+            stream << " (" << option.abbreviation << ")";
+        }
+        
+        stream << "</i>";
+
+        const Parameters::const_iterator it2 = option.parameters.find("description");
+        if(it2 != option.parameters.end())
+        {
+            stream << " : " << it2->second; 
         }
 
         stream << "</li>";

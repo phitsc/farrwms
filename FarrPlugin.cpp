@@ -303,7 +303,7 @@ void FarrPlugin::listOptions(const std::string& searchName, const std::string& f
         {
             const Search& search = (*it);
 
-            std::for_each(search.optionNamesBegin(), search.optionNamesEnd(), std::tr1::bind(&FarrPlugin::addOptionToResults, this, search, _1, filter));
+            std::for_each(search.optionsBegin(), search.optionsEnd(), std::tr1::bind(&FarrPlugin::addOptionToResults, this, search, _1, filter));
         }
     }
 }
@@ -317,12 +317,12 @@ void FarrPlugin::listCachedItems(const std::string& filter)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FarrPlugin::addOptionToResults(const Search& search, const std::string& optionName, const std::string& filter)
+void FarrPlugin::addOptionToResults(const Search& search, const Search::Option& option, const std::string& filter)
 {
-    if(!optionName.empty() && (filter.empty() || util::String::containsSubstringNoCase(optionName, filter)))
+    if(!option.name.empty() && (filter.empty() || util::String::containsSubstringNoCase(option.name, filter)))
     {
-        const std::string caption = search.getName() + " +" + optionName;
-        _farrItems.push_back(FarrItem(caption, search.getParameter(optionName, "description"), _farrAlias + search.getName() + " +" + optionName, search.getParameter(optionName, "farrIconPath"), FarrItem::Alias));
+        const std::string caption = search.getName() + " +" + option.name;
+        _farrItems.push_back(FarrItem(caption, search.getParameter(option.name, "description"), _farrAlias + search.getName() + " +" + option.name, search.getParameter(option.name, "farrIconPath"), FarrItem::Alias));
     }
 }
 
