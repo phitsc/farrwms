@@ -54,7 +54,7 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
     const std::string optionName = (pos == std::string::npos) ? categoryName : categoryName.substr(0, pos);
     const std::string abbreviation = (pos == std::string::npos) ? "" : categoryName.substr(pos + 1);
 
-    char categoryIconPath[MAX_PATH];
+    char categoryIconPath[MAX_PATH] = { 0 };
     PathAppend(categoryIconPath, iconPath.c_str());
     PathRemoveExtension(categoryIconPath);
     PathAppend(categoryIconPath, std::string("-" + optionName).c_str());
@@ -74,6 +74,32 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
         assignProperty(parameters, "farrGroup", iniFile.getParameterValue(categoryName, "farrGroup", "__UNDEF"));
         assignProperty(parameters, "farrPath", iniFile.getParameterValue(categoryName, "farrPath", "__UNDEF"));
         assignProperty(parameters, "farrIconPath", (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
+
+        for(unsigned long index = 1; index <= 9; ++index)
+        {
+            if(assignProperty(parameters, "contextCaption" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextCaption" + util::String::toString(index), "__UNDEF")))
+            {
+                assignProperty(parameters, "contextHint" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextHint" + util::String::toString(index), "__UNDEF"));
+                assignProperty(parameters, "contextPath" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextPath" + util::String::toString(index), "__UNDEF"));
+
+                std::string iconName = iniFile.getParameterValue(categoryName, "contextIcon" + util::String::toString(index), "__UNDEF");
+                if(iconPath != "__UNDEF")
+                {
+                    char contextIconPath[MAX_PATH] = { 0 };
+                    PathAppend(contextIconPath, iconPath.c_str());
+                    PathRemoveFileSpec(contextIconPath);
+                    PathAppend(contextIconPath, iconName.c_str());
+                    if(PathFileExists(contextIconPath) == TRUE)
+                    {
+                        assignProperty(parameters, "contextIcon" + util::String::toString(index), contextIconPath);
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 }
 

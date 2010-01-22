@@ -15,6 +15,7 @@
 
 #include "FarrPlugin.h"
 #include "Util.h"
+#include "Farr.h"
 
 
 
@@ -500,7 +501,7 @@ PREFUNCDEF BOOL EFuncName_Request_ItemResultByIndex(int resultindex, char* destb
     util::String::copyString(destbuf_path, maxlen, item.path);
     util::String::copyString(destbuf_groupname, maxlen, item.group);
     util::String::copyString(destbuf_iconfilename, maxlen, item.iconPath);
-    *tagvoidpp = (void*)(item.entryType == FarrItem::Alias) ? new std::string(item.caption) : 0;
+    *tagvoidpp = (void*)resultindex;
 
 
     // ok filled one
@@ -535,57 +536,85 @@ PREFUNCDEF BOOL EFuncName_Request_TextResultCharp(char **charp)
 // Return TRUE to takeover launching and prevent all other further launching
 // or FALSE to continue launching after we return
 //
-PREFUNCDEF BOOL EFuncName_Allow_ProcessTrigger(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT entrytype, void* tagvoidp, BOOL* closeafterp)
+PREFUNCDEF BOOL EFuncName_Allow_ProcessTriggerV2(const char* destbuf_path, const char* /*destbuf_caption*/, const char* /*destbuf_groupname*/, int pluginid, int thispluginid, int /*score*/, E_EntryTypeT entrytype, void* tagvoidp, BOOL* closeafterp, int triggermode)
 {
     if(thispluginid == pluginid)
     {
-        bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
-
-        std::string path(destbuf_path); 
-
-        OutputDebugString(path.c_str());
-        OutputDebugString("\n");
-
-        switch(entrytype)
+        if(triggermode == E_AllowProcessTriggerMode_Explicit)
         {
-        case E_EntryType_ALIAS:
-            {
-                *closeafterp = FALSE;
+            bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
 
-                if(!shiftPressed)
+            std::string path(destbuf_path); 
+
+            OutputDebugString(path.c_str());
+            OutputDebugString("\n");
+
+            switch(entrytype)
+            {
+            case E_EntryType_ALIAS:
                 {
-                    path += " ";
+                    *closeafterp = FALSE;
 
-                    callbackfp_set_strval(hostptr, "setsearch", (char*)path.c_str());
+                    if(!shiftPressed)
+                    {
+                        path += " ";
+
+                        callbackfp_set_strval(hostptr, "setsearch", (char*)path.c_str());
+                    }
+                    else
+                    {
+                        const unsigned long resultItemIndex = reinterpret_cast<unsigned long>(tagvoidp);
+                        if(resultItemIndex < farrPlugin->getItemCount())
+                        {
+                            const FarrItem& farrItem = farrPlugin->getItem(resultItemIndex);
+
+                            farrPlugin->showSearchInfo(farrItem.caption);
+                        }
+                    }
+
+                    return TRUE;
                 }
-                else
+
+            case E_EntryType_FILE:
                 {
-                    const std::string* searchName = reinterpret_cast<std::string*>(tagvoidp);
-                    farrPlugin->showSearchInfo(*searchName);
-                    delete searchName;
+                    *closeafterp = TRUE;
+
+                    const std::string file = util::String::quoteSpaces(path);
+                    callbackfp_set_strval(hostptr, "launch", (char*)file.c_str());
+
+                    return TRUE;
                 }
 
-                return TRUE;
+            case E_EntryType_URL:
+                {
+                    *closeafterp = TRUE;
+
+                    const std::string url = std::string("http://") + path;
+                    callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
+
+                    return TRUE;
+                }
             }
-
-        case E_EntryType_FILE:
+        }
+        else if(triggermode == E_AllowProcessTriggerMode_PrepareContextMenu)
+        {
+            const unsigned long resultItemIndex = reinterpret_cast<unsigned long>(tagvoidp);
+            if(resultItemIndex < farrPlugin->getItemCount())
             {
-                *closeafterp = TRUE;
+                const FarrItem& farrItem = farrPlugin->getItem(resultItemIndex);
 
-                const std::string file = util::String::quoteSpaces(path);
-                callbackfp_set_strval(hostptr, "launch", (char*)file.c_str());
+                farr::MenuItems menuItems;
 
-                return TRUE;
-            }
+                FarrItem::ContextItems::const_iterator it = farrItem.contextItems.begin();
+                const FarrItem::ContextItems::const_iterator end = farrItem.contextItems.end();
+                for( ; it != end; ++it)
+                {
+                    const ContextItem& contextItem = *it;
 
-        case E_EntryType_URL:
-            {
-                *closeafterp = TRUE;
+                    menuItems.push_back(farr::MenuItem(contextItem.caption, contextItem.hint, contextItem.iconPath, contextItem.path));
+                }
 
-                const std::string url = std::string("http://") + path;
-                callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
-
-                return TRUE;
+                farr::addMenuItems(farr::ContextMenu, menuItems);
             }
         }
     }

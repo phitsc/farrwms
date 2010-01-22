@@ -7,6 +7,23 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+struct ContextItem
+{
+    ContextItem(const std::string& caption_, const std::string& hint_, const std::string& path_, const std::string& iconPath_) :
+        caption(caption_),
+        hint(hint_),
+        path(path_),
+        iconPath(iconPath_)
+    {}
+
+    std::string caption;
+    std::string hint;
+    std::string path;
+    std::string iconPath;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
 struct FarrItem
 {
     enum EntryType
@@ -17,12 +34,12 @@ struct FarrItem
         Url = 4,
     };
 
-    FarrItem(const std::string& caption_, const std::string& group_, const std::string& path_, const std::string& iconPath_, EntryType entryType_)
-        :caption(caption_),
-         group(group_),
-         path(path_),
-         iconPath(iconPath_),
-         entryType(entryType_)
+    FarrItem(const std::string& caption_, const std::string& group_, const std::string& path_, const std::string& iconPath_, EntryType entryType_) :
+        caption(caption_),
+        group(group_),
+        path(path_),
+        iconPath(iconPath_),
+        entryType(entryType_)
     {}
 
     bool operator<(const FarrItem& farrItem) const
@@ -35,6 +52,9 @@ struct FarrItem
     std::string path;
     std::string iconPath;
     EntryType   entryType;
+
+    typedef std::vector<ContextItem> ContextItems;
+    ContextItems contextItems;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
