@@ -39,10 +39,22 @@ void setNewSearch(const std::string& searchText)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void addStatusBarMenuItem(const std::string& caption, const std::string& hint, const std::string& icon, const std::string& launchCommand)
+void addMenuItems(MenuType menuType, const MenuItems& menuItems)
 {
-    const std::string menuStrings = "type=item|caption=" + caption + "|icon=" + icon + "|hint=" + hint + "|launch=" + launchCommand;
-    callbackfp_set_strval(hostptr, "addmenu.statusbar", (char*)menuStrings.c_str());
+    std::string menuStrings;
+
+    MenuItems::const_iterator it = menuItems.begin();
+    const MenuItems::const_iterator end = menuItems.end();
+    for( ; it != end; ++it)
+    {
+        const MenuItem& menuItem = *it;
+        menuStrings += "type=item|caption=" + menuItem.caption + "|icon=" + menuItem.iconPath + "|hint=" + menuItem.hint + "|launch=" + menuItem.command + "\n";
+    }
+
+    if(!menuStrings.empty())
+    {
+        callbackfp_set_strval(hostptr, (menuType == ContextMenu) ? "addmenu.contextmenu" : "addmenu.statusbar", (char*)menuStrings.c_str());
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

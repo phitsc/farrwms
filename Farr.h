@@ -2,6 +2,7 @@
 
 #include <string>
 #include <windows.h>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -14,8 +15,28 @@ namespace farr
     void setStatusText(const std::string& statusText);
     void reportError(const std::string& errorText);
     void displayAlertMessage(const std::string& text);
-    void addStatusBarMenuItem(const std::string& caption, const std::string& hint, const std::string& icon, const std::string& command);
     long getMaxResults();
+
+    enum MenuType
+    {
+        ContextMenu,
+        Statusbar
+    };
+
+    struct MenuItem
+    {
+        MenuItem(const std::string& caption_, const std::string& hint_, const std::string& iconPath_, const std::string& command_) :
+            caption(caption_), hint(hint_), iconPath(iconPath_), command(command_)
+        {}
+
+        std::string caption;
+        std::string hint;
+        std::string iconPath;
+        std::string command;
+    };
+    typedef std::vector<MenuItem> MenuItems;
+
+    void addMenuItems(MenuType menuType, const MenuItems& menuItems);
 
     bool signalSearchStateChanged(bool isSearching, unsigned long itemCount = 0);
 

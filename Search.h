@@ -87,11 +87,17 @@ private:
     static bool isValidRegularExpression(const std::string& searchName, const std::string& optionName, const std::string& pattern);
 	static std::string findIconPath(const std::string& searchFile);
 
-    static void assignProperty(Search::Parameters& parameters, const std::string& parameterName, const std::string& value)
+    static bool assignProperty(Search::Parameters& parameters, const std::string& parameterName, const std::string& value)
     {
         if(value != "__UNDEF")
         {
             parameters[parameterName] = value;
+
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 

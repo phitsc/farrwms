@@ -62,6 +62,7 @@ enum E_WantFeaturesT { E_WantFeatures_searchinput_regex=0, E_SupportFeatures_sea
 enum E_ResultPostProcessingT { E_ResultPostProcessing_ImmediateDisplay = 0, E_ResultPostProcessing_AddScore = 1, E_ResultPostProcessing_MatchAgainstSearch = 2 , E_ResultPostProcessing_AddScore_wPats =3 , E_ResultPostProcessing_MatchAgainstSearch_wPats = 4, E_ResultPostProcessing_dummybig=79000};
 enum E_EntryTypeT { E_EntryType_UNKNOWN=0, E_EntryType_FILE=1, E_EntryType_FOLDER=2, E_EntryType_ALIAS=3, E_EntryType_URL=4, E_EntryType_PLUGIN=5, E_EntryType_CLIP=6, E_EntryType_ALIASFILE=7, E_EntryType_dummybig=79000};
 enum E_TriggerMethodTypeT { E_TriggerMethodType_Normal=0, E_TriggerMethodType_PressEnter=1, E_TriggerMethodType_dummybig=79000};
+enum E_AllowProcessTriggerModeT { E_AllowProcessTriggerMode_NonExplicit=0, E_AllowProcessTriggerMode_Explicit=1, E_AllowProcessTriggerMode_PrepareContextMenu=2, E_AllowProcessTriggerMode_ResultSelected=3, E_AllowProcessTriggerMode_Tabbed=4, E_AllowProcessTriggerMode_dummybig=79000};
 //---------------------------------------------------------------------------
 
 
@@ -113,8 +114,8 @@ typedef BOOL (*FpFunc_Request_ItemResultByIndex)(int resultindex, char *destbuf_
 #define EFuncName_Request_TextResultCharp PluginFunc_Request_TextResultCharp
 typedef BOOL (*FpFunc_Request_TextResultCharp)(char **charp);
 
-#define EFuncName_Allow_ProcessTrigger PluginFunc_Allow_ProcessTrigger
-typedef BOOL (*FpFunc_Allow_ProcessTrigger)(const char* destbuf_path, const char* destbuf_caption, const char* destbuf_groupname, int pluginid,int thispluginid, int score, E_EntryTypeT entrytype, void* tagvoidp, BOOL *closeafterp);
+#define EFuncName_Allow_ProcessTriggerV2 PluginFunc_Allow_ProcessTriggerV2
+typedef BOOL (*FpFunc_Allow_ProcessTriggerV2)(const char* destbuf_path, const char* destbuf_caption, const char* destbuf_groupname, int pluginid,int thispluginid, int score, E_EntryTypeT entrytype, void* tagvoidp, BOOL *closeafterp, int triggermode);
 
 #define EFuncName_Do_AdjustResultScore PluginFunc_Do_AdjustResultScore
 typedef BOOL (*FpFunc_Do_AdjustResultScore)(const char* itempath, int *scorep);

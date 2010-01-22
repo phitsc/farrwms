@@ -180,7 +180,6 @@ void FarrPlugin::search(const char* rawSearchString)
 void FarrPlugin::stopSearch()
 {
     _xmlHttpRequest->abort();
-    clearResults();
 
     _isSearching = farr::signalSearchStateChanged(false);
 }
@@ -221,14 +220,32 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
         const std::string group = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "farrGroup"), variables)));
         const std::string url = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "farrPath"), variables)));
 
-        _farrItems.push_back(FarrItem(caption, group, removeHttp(url), _currentSearch->getParameter(_currentOptionName, "farrIconPath"), FarrItem::Url));
+        FarrItem farrItem(caption, group, removeHttp(url), _currentSearch->getParameter(_currentOptionName, "farrIconPath"), FarrItem::Url);
+
+        for(unsigned long index = 1; index <= 9; ++index)
+        {
+            const std::string contextCaption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "contextCaption" + util::String::toString(index)), variables)));
+            if(contextCaption.empty())
+            {
+                break;
+            }
+            const std::string contextHint = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "contextHint" + util::String::toString(index)), variables)));
+            const std::string contextPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "contextPath" + util::String::toString(index)), variables)));
+            const std::string contextIconPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentOptionName, "contextIcon" + util::String::toString(index)), variables)));
+
+            farrItem.contextItems.push_back(ContextItem(contextCaption, contextHint, contextPath, contextIconPath));
+        }
+
+        _farrItems.push_back(farrItem);
     }
 
     _farrItemCache = _farrItems;
 
     if((long)_farrItems.size() > farr::getMaxResults())
     {
-        farr::addStatusBarMenuItem("Show more results", "Show more results", _iconPath + "Down_small.ico", "dosearch " + _farrAlias + "!showAllItems");
+        farr::MenuItems menuItems;
+        menuItems.push_back(farr::MenuItem("Show more results", "Show more results", _iconPath + "Down_small.ico", "dosearch " + _farrAlias + "!showAllItems"));
+        farr::addMenuItems(farr::Statusbar, menuItems);
     }
 
     _isSearching = farr::signalSearchStateChanged(false, getItemCount());
