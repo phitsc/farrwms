@@ -540,7 +540,7 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTriggerV2(const char* destbuf_path, const
 {
     if(thispluginid == pluginid)
     {
-        if(triggermode == E_AllowProcessTriggerMode_Explicit)
+        if((triggermode == E_AllowProcessTriggerMode_Explicit) || (triggermode == E_AllowProcessTriggerMode_NonExplicit))
         {
             bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
 
