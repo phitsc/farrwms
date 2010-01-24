@@ -12,6 +12,11 @@
 
 using namespace std::tr1::placeholders; 
 
+namespace
+{
+    const std::string ValidOptionCharacters("+/-");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 FarrPlugin::FarrPlugin(const std::string& modulePath) :
@@ -116,7 +121,15 @@ void FarrPlugin::search(const char* rawSearchString)
                 const bool isFeed = (_currentSearch->getParameter(_currentOptionName, "isFeed") == "true");
                 if(isFeed)
                 {
-                    if(_currentSearchTerm.empty())
+                    if(!_currentSearchTerm.empty())
+                    {
+                        listCachedItems(_currentSearchTerm);
+                    }
+                    else if(!_currentOptionName.empty() || hasOption)
+                    {
+                        listOptions(searchName, _currentOptionName);
+                    }
+                    else
                     {
                         _farrItemCache.clear();
 
@@ -127,10 +140,6 @@ void FarrPlugin::search(const char* rawSearchString)
                         _xmlHttpRequest->send();
 
                         return; // searching continues
-                    }
-                    else
-                    {
-                        listCachedItems(_currentSearchTerm);
                     }
                 }
                 else
@@ -395,7 +404,7 @@ void FarrPlugin::splitSearch(const std::string& searchString, std::string& searc
 		searchName = searchString.substr(0, pos1);
         const std::string potentialOptionAndSearchTerm = searchString.substr(pos1 + 1);
 
-        if(!potentialOptionAndSearchTerm.empty() && (potentialOptionAndSearchTerm.substr(0, 1).find_first_of("+/-") == 0))
+        if(!potentialOptionAndSearchTerm.empty() && (potentialOptionAndSearchTerm.substr(0, 1).find_first_of(ValidOptionCharacters) == 0))
         {
             hasOption = true;
 
