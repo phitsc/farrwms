@@ -64,7 +64,7 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
 
     if(isValidRegularExpression(search.getName(), optionName, pattern))
     {
-        Search::Parameters& parameters = search.addOption(optionName, abbreviation);
+        Search::Parameters& parameters = search.addSubsearch(optionName, abbreviation);
         assignProperty(parameters, "description", iniFile.getParameterValue(categoryName, "description", "__UNDEF"));
         assignProperty(parameters, "contributor", iniFile.getParameterValue(categoryName, "contributor", "__UNDEF"));
         assignProperty(parameters, "searchUrl", iniFile.getParameterValue(categoryName, "searchUrl", "__UNDEF"));
@@ -153,9 +153,9 @@ Search::Search(const std::string& name) :
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Search::Parameters& Search::addOption(const std::string& optionName, const std::string& abbreviation)
+Search::Parameters& Search::addSubsearch(const std::string& optionName, const std::string& abbreviation)
 {
-    return _options.insert(Option(optionName, abbreviation)).first->parameters;
+    return _subsearches.insert(Subsearch(optionName, abbreviation)).first->parameters;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,11 +170,19 @@ bool Search::hasName(const std::string& name) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-const std::string& Search::getParameter(const std::string& optionName, const std::string& parameterName) const
+bool Search::hasSubsearch(const std::string& subSearchNameOrAbbreviation) const
+{
+    const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::equalsNameOrAbbreviation, _1, subSearchNameOrAbbreviation));
+    return (it != _subsearches.end());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+const std::string& Search::getParameter(const std::string& subsearchName, const std::string& parameterName) const
 {
     {
-        const Options::const_iterator it = std::find_if(_options.begin(), _options.end(), std::tr1::bind(&Option::equalsNameOrAbbreviation, _1, optionName));
-        if(it != _options.end())
+        const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::equalsNameOrAbbreviation, _1, subsearchName));
+        if(it != _subsearches.end())
         {
             const Parameters& parameters = it->parameters;
 
@@ -188,8 +196,8 @@ const std::string& Search::getParameter(const std::string& optionName, const std
     }
 
     {
-        const Options::const_iterator it = std::find_if(_options.begin(), _options.end(), std::tr1::bind(&Option::equalsName, _1, ""));
-        if(it != _options.end())
+        const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::equalsName, _1, ""));
+        if(it != _subsearches.end())
         {
             const Parameters& parameters = it->parameters;
 
@@ -221,11 +229,11 @@ const std::string Search::getInfoAsHtml() const
 
     stream << getParameter("", "description");
 
-    if(_options.size() > 1)
+    if(_subsearches.size() > 1)
     {
         stream << "<h3>Subsearches</h3>";
         stream << "<ul>";
-        std::for_each(_options.begin(), _options.end(), std::tr1::bind(&Search::getOptionInfoAsHtml, this, _1, std::tr1::ref(stream)));
+        std::for_each(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Search::getSubsearchInfoAsHtml, this, _1, std::tr1::ref(stream)));
         stream << "</ul>";
     }
 
@@ -234,7 +242,7 @@ const std::string Search::getInfoAsHtml() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Search::getOptionInfoAsHtml(const Option& option, std::stringstream& stream) const
+void Search::getSubsearchInfoAsHtml(const Subsearch& option, std::stringstream& stream) const
 {
     if(!option.name.empty())
     {

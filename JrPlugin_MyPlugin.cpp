@@ -542,12 +542,12 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTriggerV2(const char* destbuf_path, const
     {
         if((triggermode == E_AllowProcessTriggerMode_Explicit) || (triggermode == E_AllowProcessTriggerMode_NonExplicit))
         {
-            bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
+            const bool shiftPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
 
             std::string path(destbuf_path); 
 
-            OutputDebugString(path.c_str());
-            OutputDebugString("\n");
+            //OutputDebugString(path.c_str());
+            //OutputDebugString("\n");
 
             switch(entrytype)
             {
@@ -587,10 +587,20 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTriggerV2(const char* destbuf_path, const
 
             case E_EntryType_URL:
                 {
-                    *closeafterp = TRUE;
+                    if(shiftPressed)
+                    {
+                        *closeafterp = FALSE;
 
-                    const std::string url = std::string("http://") + path;
-                    callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
+                        const std::string url = std::string("htmlviewurl http://") + path;
+                        callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
+                    }
+                    else
+                    {
+                        *closeafterp = TRUE;
+
+                        const std::string url = std::string("http://") + path;
+                        callbackfp_set_strval(hostptr, "launch", (char*)url.c_str());
+                    }
 
                     return TRUE;
                 }

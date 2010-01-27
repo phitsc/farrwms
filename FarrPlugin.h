@@ -39,14 +39,14 @@ private:
     void listAboutItems();
 
     void listSearches(const std::string& filter);
-    void listOptions(const std::string& searchName, const std::string& filter);
+    void listSubsearches(const std::string& searchName, const std::string& filter);
     void listCachedItems(const std::string& filter);
     void addSearchToResults(const Search& search, const std::string& filter);
-    void addOptionToResults(const Search& search, const Search::Option& option, const std::string& filter);
+    void addSubsearchToResults(const Search& search, const Search::Subsearch& subsearch, const std::string& filter);
     void addItemToResults(const FarrItem& farrItem, const std::string& filter);
 
     const Search* _currentSearch;
-    std::string   _currentOptionName;
+    std::string   _currentSubsearchName;
     std::string   _currentSearchTerm;
     bool _isSearching;
 

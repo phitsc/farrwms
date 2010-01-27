@@ -199,6 +199,19 @@ bool String::containsSubstringNoCase(const std::string& value, const std::string
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool String::startsWithNoCase(const std::string& value, const std::string& substring)
+{
+    std::string valueLower(value);
+    tolower(valueLower);
+
+    std::string substringLower(substring);
+    tolower(substringLower);
+
+    return (valueLower.find(substringLower) == 0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 std::string String::getNumberWithOrdinal(const std::string& numberWithoutOrdinal)
 {
     std::string result;

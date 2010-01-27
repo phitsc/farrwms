@@ -78,6 +78,7 @@ struct String
     static StringPair split(const std::string& stringToSplit, char delimiter);
 
     static bool containsSubstringNoCase(const std::string& value, const std::string& substring);
+    static bool startsWithNoCase(const std::string& value, const std::string& substring);
 
     static std::string getNumberWithOrdinal(const std::string& numberWithoutOrdinal);
 
