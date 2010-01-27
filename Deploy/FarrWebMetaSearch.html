@@ -43,7 +43,7 @@ DAMAGE.
 <!--}}}-->
 
 <!--PRE-HEAD-END-->
-<title> FarrWebMetaSearch - 1.4.0 </title>
+<title> FarrWebMetaSearch - 1.4.1 </title>
 <style id="styleArea" type="text/css">
 #saveTest {display:none;}
 #messageArea {display:none;}
@@ -602,8 +602,8 @@ FarrWebMetaSearch can be used to search feeds. The behaviour is different to the
 
 A search defined as a feed will start searching as soon as one enters a space after the search name. Once the results are displayed, the search terms typed will narrow down the results to match the entered search terms. (note that starting to type search terms before the result items are displayed will currently stop the search).</pre>
 </div>
-<div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201001241947" changecount="6">
-<pre>1.4.0</pre>
+<div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201001262051" changecount="7">
+<pre>1.4.1</pre>
 </div>
 <div title="SiteTitle" modifier="phitsc" created="201001082227" changecount="1">
 <pre>FarrWebMetaSearch</pre>
@@ -618,8 +618,20 @@ A search defined as a feed will start searching as soon as one enters a space af
 * Make additional links available via context menu entries
 * Add many more searches :)</pre>
 </div>
-<div title="Version history" modifier="phitsc" created="201001082239" modified="201001241943" changecount="30">
-<pre>''1.4.0 - 24. January 2010''
+<div title="Version history" modifier="YourName" created="201001082239" modified="201001272203" changecount="38">
+<pre>''1.4.2''
+* now filters for subsearch abbreviations too
+* new / updated searches:
+** onelook (by Perry Mowbray) - extremely powerful!
+
+''1.4.1 - 26. January 2010''
+* subsearch filtering now matches at the start (no longer anywhere in the string)
+* show abbreviation of subsearches (if they have one). e.g. wms amazon +books (b)
+* Shift + Enter launches search result in FARR's internal HTML view
+* replace more special characters in FARR output (&amp;nbsp; and &amp;deg;)
+* fixed problem with subsearches having isFeed=true
+
+''1.4.0 - 24. January 2010''
 * Shift + Enter shows info about search (using FARR's internal HTML view)
 * Subsearches can now have abbreviations ( {{{[Subsearch|Abb]}}} )
 * Searches can now defined context menu items

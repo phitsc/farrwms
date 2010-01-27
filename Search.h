@@ -19,24 +19,25 @@ public:
 
     typedef std::map<std::string, std::string> Parameters;
 
-    Parameters& addOption(const std::string& optionName, const std::string& abbreviation);
+    Parameters& addSubsearch(const std::string& optionName, const std::string& abbreviation);
 
 	bool hasName(const std::string& name) const;
+    bool hasSubsearch(const std::string& subSearchNameOrAbbreviation) const;
 
     const std::string& getName() const { return _name; }
-    const std::string& getParameter(const std::string& optionName, const std::string& parameterName) const;
+    const std::string& getParameter(const std::string& subsearchName, const std::string& parameterName) const;
     const std::string getInfoAsHtml() const;
 
-    typedef std::set<std::string> OptionNames;
+    typedef std::set<std::string> SubsearchNames;
 
-    struct Option
+    struct Subsearch
     {
-        Option(const std::string& name_, const std::string& abbreviation_) : name(name_), abbreviation(abbreviation_)
+        Subsearch(const std::string& name_, const std::string& abbreviation_) : name(name_), abbreviation(abbreviation_)
         {}
 
-        bool operator<(const Option& option) const
+        bool operator<(const Subsearch& subsearch) const
         {
-            return (name < option.name);
+            return (name < subsearch.name);
         }
 
         bool equalsName(const std::string& optionName) const
@@ -55,17 +56,17 @@ public:
         Parameters parameters;
     };
 
-    typedef std::set<Option> Options;
-    typedef Options::const_iterator OptionsConstIterator;
+    typedef std::set<Subsearch> Subsearches;
+    typedef Subsearches::const_iterator SubsearchesConstIterator;
 
-    OptionsConstIterator optionsBegin() const { return _options.begin(); }
-    OptionsConstIterator optionsEnd() const { return _options.end(); }
+    SubsearchesConstIterator subsearchesBegin() const { return _subsearches.begin(); }
+    SubsearchesConstIterator subsearchesEnd() const { return _subsearches.end(); }
 
 private:
-    void getOptionInfoAsHtml(const Option& option, std::stringstream& stream) const;
+    void getSubsearchInfoAsHtml(const Subsearch& subsearch, std::stringstream& stream) const;
 
     std::string _name;
-    Options     _options;
+    Subsearches _subsearches;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
