@@ -5,6 +5,7 @@
 #include "msxml.h"
 #include "XmlHttpEventSink.h"
 #include "XmlHttpRequestEvents.h"
+#include "LogFile.h"
 
 #include <string>
 #include <map>
@@ -50,6 +51,8 @@ private:
     std::string   _currentSearchTerm;
     bool _isSearching;
 
+    LogFile _logFile;
+
     MSXML2::IXMLHTTPRequestPtr _xmlHttpRequest;
     XmlHttpEventSink* _xmlHttpEventSink;
 
@@ -72,7 +75,7 @@ private:
 
     typedef std::map<std::string, std::string> Variables;
 
-    static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasOption);
+    static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasSubsearch);
     static std::string replaceCharacterEntityReferences(const std::string& text);
     static std::string removeHttp(const std::string& url);
     static void        replaceVariable(std::string& text, const Variables::value_type& variableAndValue);

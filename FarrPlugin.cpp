@@ -26,7 +26,7 @@ FarrPlugin::FarrPlugin(const std::string& modulePath) :
     _helpFile(modulePath + "\\" + farr::getReadMeFileName()),
 	_searches(modulePath + "\\searches\\"),
     _searchesPath(modulePath + "\\searches\\")
-    {
+{
     _xmlHttpRequest.CreateInstance(L"Msxml2.XMLHTTP.3.0");
 
     _xmlHttpEventSink = new XmlHttpEventSink(_xmlHttpRequest, *this);
@@ -105,11 +105,11 @@ void FarrPlugin::search(const char* rawSearchString)
     std::string searchName;
     _currentSubsearchName = "";
     _currentSearchTerm = "";
-    bool hasOption = false;
+    bool hasSubsearch = false;
 
     if(!processCommand(searchString))
     {
-        splitSearch(searchString, searchName, _currentSubsearchName, _currentSearchTerm, hasOption);
+        splitSearch(searchString, searchName, _currentSubsearchName, _currentSearchTerm, hasSubsearch);
 
         if(!searchName.empty())
 	    {
@@ -121,15 +121,19 @@ void FarrPlugin::search(const char* rawSearchString)
                 const bool isFeed = (_currentSearch->getParameter(_currentSubsearchName, "isFeed") == "true");
                 if(isFeed)
                 {
+                    _logFile.writeLine("Search name: '" + searchName + "' Subsearch name: '" + _currentSubsearchName + "' Search term: '" + _currentSearchTerm + "' Has Subsearch: " + (hasSubsearch ? "yes" : "no") + " Is feed: yes");
+
                     if(!_currentSearchTerm.empty())
                     {
                         listCachedItems(_currentSearchTerm);
                     }
-                    else if(!hasOption || (hasOption && !_currentSubsearchName.empty() && _currentSearch->hasSubsearch(_currentSubsearchName)))
+                    else if(!hasSubsearch || (hasSubsearch && !_currentSubsearchName.empty() && _currentSearch->hasSubsearch(_currentSubsearchName)))
                     {
                         _farrItemCache.clear();
 
                         const std::string searchUrl = _currentSearch->getParameter(_currentSubsearchName, "searchUrl");
+
+                        _logFile.writeLine("Search URL: '" + searchUrl + "'");
 
                         _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                         _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
@@ -137,13 +141,15 @@ void FarrPlugin::search(const char* rawSearchString)
 
                         return; // searching continues
                     }
-                    else if(!_currentSubsearchName.empty() || hasOption)
+                    else if(!_currentSubsearchName.empty() || hasSubsearch)
                     {
                         listSubsearches(searchName, _currentSubsearchName);
                     }
                 }
                 else
                 {
+                    _logFile.writeLine("Search name: '" + searchName + "' Subsearch name: '" + _currentSubsearchName + "' Search term: '" + _currentSearchTerm + "' Has Subsearch: " + (hasSubsearch ? "yes" : "no") + " Is feed: no");
+
                     if(!_currentSearchTerm.empty())
                     {
                         const bool containsSearchTermVariable = (_currentSearch->getParameter(_currentSubsearchName, "searchUrl").find("%SEARCHTERM%") != std::string::npos);
@@ -153,13 +159,15 @@ void FarrPlugin::search(const char* rawSearchString)
 
                         const std::string searchUrl = containsSearchTermVariable ? replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "searchUrl"), variables) : (_currentSearch->getParameter(_currentSubsearchName, "searchUrl") + _currentSearchTerm);
 
+                        _logFile.writeLine("Search URL: '" + searchUrl + "'");
+
                         _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
                         _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
                         _xmlHttpRequest->send();
 
                         return; // searching continues
                     }
-                    else if(!_currentSubsearchName.empty() || hasOption)
+                    else if(!_currentSubsearchName.empty() || hasSubsearch)
                     {
                         listSubsearches(searchName, _currentSubsearchName);
                     }
@@ -191,6 +199,8 @@ void FarrPlugin::stopSearch()
     _xmlHttpRequest->abort();
 
     _isSearching = farr::signalSearchStateChanged(false);
+
+    _logFile.writeLine("Stopped search");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -209,8 +219,11 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     Variables variables;
     variables["%SEARCHTERM%"] = _currentSearchTerm;
     variables["%SEARCHURL%"] = replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "searchUrl"), variables);
+    variables["%PLUGINALIAS%"] = farr::getPluginAlias();
 
     const std::string resultPattern = replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "resultPattern"), variables);
+
+    _logFile.writeLine("Result pattern: '" + resultPattern + "'");
 
     //std::stringstream stream;
     //stream << "search term: '" << _currentSearchTerm << "'\n";
@@ -256,6 +269,10 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
         menuItems.push_back(farr::MenuItem("Show more results", "Show more results", _iconPath + "Down_small.ico", "dosearch " + _farrAlias + "!showAllItems"));
         farr::addMenuItems(farr::Statusbar, menuItems);
     }
+
+    std::stringstream stream;
+    stream << "Found " << _farrItems.size() << " results";
+    _logFile.writeLine(stream.str());
 
     _isSearching = farr::signalSearchStateChanged(false, getItemCount());
 }
@@ -378,16 +395,40 @@ bool FarrPlugin::processCommand(const std::string& searchString)
 
             return true;
         }
-        else if(searchString.find("!about") == 0)
+        else if(searchString == "!about")
         {
             listAboutItems();
 
             return true;
         }
-        else if(searchString.find("!showAllItems") == 0)
+        else if(searchString == "!showAllItems")
         {
             farr::setShowAllMode();
             listCachedItems("");
+        }
+        else if(searchString == "!enableLogging")
+        {
+            if(_logFile.enable())
+            {
+                const std::string message = "FarrWebMetaSearch\nLogging enabled.\n" + _logFile.getPath();
+                farr::displayAlertMessage(message);
+            }
+            else
+            {
+                const std::string errorText = "FarrWebMetaSearch Error!\nCreating log file failed.";
+                farr::displayAlertMessage(errorText);
+            }
+
+            farr::setNewSearch(_farrAlias);
+        }
+        else if(searchString == "!disableLogging")
+        {
+            _logFile.disable();
+
+            const std::string message = "FarrWebMetaSearch\nLogging disabled.";
+            farr::displayAlertMessage(message);
+
+            farr::setNewSearch(_farrAlias);
         }
     }
 
@@ -396,7 +437,7 @@ bool FarrPlugin::processCommand(const std::string& searchString)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FarrPlugin::splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasOption)
+void FarrPlugin::splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasSubsearch)
 {
  	const std::string::size_type pos1 = searchString.find(' ');
 	if(pos1 != std::string::npos)
@@ -406,7 +447,7 @@ void FarrPlugin::splitSearch(const std::string& searchString, std::string& searc
 
         if(!potentialOptionAndSearchTerm.empty() && (potentialOptionAndSearchTerm.substr(0, 1).find_first_of(ValidOptionCharacters) == 0))
         {
-            hasOption = true;
+            hasSubsearch = true;
 
             const std::string::size_type pos2 = potentialOptionAndSearchTerm.find(' ');
             if(pos2 != std::string::npos)
