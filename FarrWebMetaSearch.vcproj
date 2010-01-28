@@ -245,6 +245,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LogFile.h"
+				>
+			</File>
+			<File
 				RelativePath=".\msxml.h"
 				>
 			</File>
