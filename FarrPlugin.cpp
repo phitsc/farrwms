@@ -225,12 +225,6 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
     _logFile.writeLine("Result pattern: '" + resultPattern + "'");
 
-    //std::stringstream stream;
-    //stream << "search term: '" << _currentSearchTerm << "'\n";
-    //stream << "regex: '" << resultPattern << "'\n";
-
-    //OutputDebugString(stream.str().c_str());
-
     const std::tr1::regex expression(resultPattern);
     std::tr1::sregex_iterator it(responseText.begin(), responseText.end(), expression);
     std::tr1::sregex_iterator end;
@@ -318,6 +312,25 @@ void FarrPlugin::listAboutItems()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void FarrPlugin::listCommandItems()
+{
+    if(_logFile.isEnabled())
+    {
+        _farrItems.push_back(FarrItem("Disable logging", "", _farrAlias + "!disableLogging", _iconPath + "DisableLogging.ico", FarrItem::Alias));
+    }
+    else
+    {
+        _farrItems.push_back(FarrItem("Enable logging", "", _farrAlias + "!enableLogging", _iconPath + "EnableLogging.ico", FarrItem::Alias));
+    }
+
+    if(PathFileExists(_logFile.getPath().c_str()))
+    {
+        _farrItems.push_back(FarrItem("Open log file in external editor", "", _logFile.getPath(), "", FarrItem::File));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void FarrPlugin::listSearches(const std::string& filter)
 {
 	std::for_each(_searches.begin(), _searches.end(), std::tr1::bind(&FarrPlugin::addSearchToResults, this, _1, filter));
@@ -395,22 +408,22 @@ bool FarrPlugin::processCommand(const std::string& searchString)
 
             return true;
         }
-        else if(searchString == "!about")
+        else if(std::tr1::regex_match(searchString, std::tr1::regex("!about(?: )?")))
         {
             listAboutItems();
 
             return true;
         }
-        else if(searchString == "!showAllItems")
+        else if(std::tr1::regex_match(searchString, std::tr1::regex("!showAllItems(?: )?")))
         {
             farr::setShowAllMode();
             listCachedItems("");
         }
-        else if(searchString == "!enableLogging")
+        else if(std::tr1::regex_match(searchString, std::tr1::regex("!enableLogging(?: )?")))
         {
             if(_logFile.enable())
             {
-                const std::string message = "FarrWebMetaSearch\nLogging enabled.\n" + _logFile.getPath();
+                const std::string message = "FarrWebMetaSearch\nLogging enabled.";
                 farr::displayAlertMessage(message);
             }
             else
@@ -421,7 +434,7 @@ bool FarrPlugin::processCommand(const std::string& searchString)
 
             farr::setNewSearch(_farrAlias);
         }
-        else if(searchString == "!disableLogging")
+        else if(std::tr1::regex_match(searchString, std::tr1::regex("!disableLogging(?: )?")))
         {
             _logFile.disable();
 
@@ -429,6 +442,12 @@ bool FarrPlugin::processCommand(const std::string& searchString)
             farr::displayAlertMessage(message);
 
             farr::setNewSearch(_farrAlias);
+        }
+        else if(searchString[0] == '!')
+        {
+            listCommandItems();
+
+            return true;
         }
     }
 

@@ -37,14 +37,19 @@ public:
         return _file.is_open();
     }
 
+    void disable()
+    {
+        _file.close();
+    }
+
     const std::string& getPath() const
     {
         return _path;
     }
 
-    void disable()
+    bool isEnabled() const
     {
-        _file.close();
+        return _file.is_open();
     }
 
     void write(const std::string& message)

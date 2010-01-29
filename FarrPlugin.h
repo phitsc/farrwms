@@ -38,6 +38,7 @@ private:
 
     void listHelpItems();
     void listAboutItems();
+    void listCommandItems();
 
     void listSearches(const std::string& filter);
     void listSubsearches(const std::string& searchName, const std::string& filter);

@@ -43,7 +43,7 @@ DAMAGE.
 <!--}}}-->
 
 <!--PRE-HEAD-END-->
-<title> FarrWebMetaSearch - 1.4.1 </title>
+<title> FarrWebMetaSearch - 1.4.2 </title>
 <style id="styleArea" type="text/css">
 #saveTest {display:none;}
 #messageArea {display:none;}
@@ -551,7 +551,7 @@ Type {{{ wms ? }}} to open this help file in an external browser.
 [[Credits]]
 [[Disclaimer]]</pre>
 </div>
-<div title="Search config files" modifier="phitsc" created="201001092100" modified="201001241946" changecount="12">
+<div title="Search config files" modifier="phitsc" created="201001092100" modified="201001292039" changecount="13">
 <pre>New searches can be added to the FarrWebMetaSearch plugin by adding search configuration files. Search configuration files have the {{{.config}}} file extension and have to be in the plugin's {{{searches}}} subdirectory.
 
 !Basics
@@ -582,6 +582,14 @@ The {{{resultPattern}}} defines a regular expression that is applied to the sear
 
 The search term entered in the FARR find box can be used in the resultPattern as well using the {{{%SEARCHTERM%}}} variable.
 
+!Variables
+The farrCaption, farrGroup, farrPath as well as the context menu parameters can contain the following variables:
+
+| !Variable | !Description |
+| %SEARCHTERM% | Is replaced by the search term entered. |
+| %SEARCHURL% | Is replaced by the search's searchUrl. |
+| %PLUGINALIAS% | Is replaced by the plugin alias (wms by default). |
+
 !Example
 
 msdn.config
@@ -602,29 +610,30 @@ FarrWebMetaSearch can be used to search feeds. The behaviour is different to the
 
 A search defined as a feed will start searching as soon as one enters a space after the search name. Once the results are displayed, the search terms typed will narrow down the results to match the entered search terms. (note that starting to type search terms before the result items are displayed will currently stop the search).</pre>
 </div>
-<div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201001262051" changecount="7">
-<pre>1.4.1</pre>
+<div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201001292021" changecount="8">
+<pre>1.4.2</pre>
 </div>
 <div title="SiteTitle" modifier="phitsc" created="201001082227" changecount="1">
 <pre>FarrWebMetaSearch</pre>
 </div>
-<div title="Todo" modifier="phitsc" created="201001082301" modified="201001151410" changecount="4">
+<div title="Todo" modifier="phitsc" created="201001082301" modified="201001292040" changecount="5">
 <pre>* Fix icon copyright problem
 * Improve help file. Especially, extend [[Search config files]] topic
 * Add a way for users to contribute / get searches
 * Add logging / notification in case a configuration files is invalid
 * --Make original search string available as a variable in output--
-* Allow entering search option after the search terms
-* Make additional links available via context menu entries
+* --Allow entering search option after the search terms--
+* --Make additional links available via context menu entries--
 * Add many more searches :)</pre>
 </div>
-<div title="Version history" modifier="phitsc" created="201001082239" modified="201001282257" changecount="39">
-<pre>''1.4.2''
+<div title="Version history" modifier="phitsc" created="201001082239" modified="201001292040" changecount="43">
+<pre>''1.4.2 - 29. January 2010''
 * Now filters for subsearch abbreviations too
-* Added some logging capability. Type 'wms !enableLogging' to enable 'wms !disableLogging' to disable.
+* Added some logging capability. Type 'wms !' to enable / disable logging.
 * Added {{{%PLUGINALIAS%}}} variable
+* Updated help file
 * New / updated searches:
-** onelook (by Perry Mowbray) - extremely powerful!
+** onelook (by Perry Mowbray) - with more subsearches and help file!
 
 ''1.4.1 - 26. January 2010''
 * subsearch filtering now matches at the start (no longer anywhere in the string)
@@ -636,7 +645,7 @@ A search defined as a feed will start searching as soon as one enters a space af
 ''1.4.0 - 24. January 2010''
 * Shift + Enter shows info about search (using FARR's internal HTML view)
 * Subsearches can now have abbreviations ( {{{[Subsearch|Abb]}}} )
-* Searches can now defined context menu items
+* Searches can now define context menu items (see play search for an example)
 * Fixed 'feeds not showing subsearches on entering +'
 * new / updated searches:
 ** onelook (by Perry Mowbray) - added four new subsearches
