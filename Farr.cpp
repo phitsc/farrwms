@@ -48,13 +48,20 @@ void addMenuItems(MenuType menuType, const MenuItems& menuItems)
     for( ; it != end; ++it)
     {
         const MenuItem& menuItem = *it;
-        menuStrings += "type=item|caption=" + menuItem.caption + "|icon=" + menuItem.iconPath + "|hint=" + menuItem.hint + "|launch=" + menuItem.command + "\n";
+        menuStrings += "type=" + menuItem.type + "|caption=" + menuItem.caption + "|icon=" + menuItem.iconPath + "|hint=" + menuItem.hint + "|launch=" + menuItem.command + "\n";
     }
 
     if(!menuStrings.empty())
     {
         callbackfp_set_strval(hostptr, (menuType == ContextMenu) ? "addmenu.contextmenu" : "addmenu.statusbar", (char*)menuStrings.c_str());
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void clearMenuItems()
+{
+    callbackfp_set_strval(hostptr, "clearmenus", "");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

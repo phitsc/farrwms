@@ -621,7 +621,7 @@ PREFUNCDEF BOOL EFuncName_Allow_ProcessTriggerV2(const char* destbuf_path, const
                 {
                     const ContextItem& contextItem = *it;
 
-                    menuItems.push_back(farr::MenuItem(contextItem.caption, contextItem.hint, contextItem.iconPath, contextItem.path));
+                    menuItems.push_back(farr::MenuItem(contextItem.type, contextItem.caption, contextItem.hint, contextItem.iconPath, contextItem.path));
                 }
 
                 farr::addMenuItems(farr::ContextMenu, menuItems);

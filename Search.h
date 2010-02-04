@@ -6,6 +6,8 @@
 #include <set>
 #include <sstream>
 
+#include "Util.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class IniFile;
@@ -39,7 +41,14 @@ public:
         {
             if((sortOrder != 0) && (subsearch.sortOrder != 0))
             {
-                return (sortOrder < subsearch.sortOrder);
+                if(sortOrder == subsearch.sortOrder)
+                {
+                    return (name < subsearch.name);
+                }
+                else
+                {
+                    return (sortOrder < subsearch.sortOrder);
+                }
             }
             else if((sortOrder != 0) && (subsearch.sortOrder == 0))
             {
@@ -55,14 +64,14 @@ public:
             }
         }
 
-        bool equalsName(const std::string& optionName) const
+        bool equalsName(const std::string& subsearchName) const
         {
-            return (name == optionName);
+            return (util::String::tolower_copy(name) == util::String::tolower_copy(subsearchName));
         }
 
-        bool equalsNameOrAbbreviation(const std::string& optionNameOrAbbreviation) const
+        bool equalsNameOrAbbreviation(const std::string& subsearchNameOrAbbreviation) const
         {
-            return ((name == optionNameOrAbbreviation) || (abbreviation == optionNameOrAbbreviation));
+            return ((util::String::tolower_copy(name) == util::String::tolower_copy(subsearchNameOrAbbreviation)) || (util::String::tolower_copy(abbreviation) == util::String::tolower_copy(subsearchNameOrAbbreviation)));
         }
 
         std::string name;
@@ -100,7 +109,7 @@ public:
 
     enum
     {
-        MaxContextMenuItemCount = 20
+        MaxContextMenuItemCount = 32
     };
 
 private:

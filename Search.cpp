@@ -80,7 +80,9 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
 
         for(unsigned long index = 1; index <= MaxContextMenuItemCount; ++index)
         {
-            if(assignProperty(parameters, "contextCaption" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextCaption" + util::String::toString(index), "__UNDEF")))
+            const bool hasType    = assignProperty(parameters, "contextType" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextType" + util::String::toString(index), "__UNDEF"));
+            const bool hasCaption = assignProperty(parameters, "contextCaption" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextCaption" + util::String::toString(index), "__UNDEF"));
+            if(hasType || hasCaption)
             {
                 assignProperty(parameters, "contextHint" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextHint" + util::String::toString(index), "__UNDEF"));
                 assignProperty(parameters, "contextPath" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextPath" + util::String::toString(index), "__UNDEF"));
@@ -183,35 +185,16 @@ bool Search::hasSubsearch(const std::string& subSearchNameOrAbbreviation) const
 
 const std::string& Search::getParameter(const std::string& subsearchName, const std::string& parameterName) const
 {
+    const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::equalsNameOrAbbreviation, _1, subsearchName));
+    if(it != _subsearches.end())
     {
-        const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::equalsNameOrAbbreviation, _1, subsearchName));
-        if(it != _subsearches.end())
+        const Parameters& parameters = it->parameters;
+
+        const Parameters::const_iterator it2 = parameters.find(parameterName);
+        if(it2 != parameters.end())
         {
-            const Subsearch& subsearch = *it;
-
-            const Parameters& parameters = subsearch.parameters;
-
-            const Parameters::const_iterator it2 = parameters.find(parameterName);
-            if(it2 != parameters.end())
-            {
-                const std::string& value = it2->second;
-                return value;
-            }
-        }
-    }
-
-    {
-        const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::equalsName, _1, ""));
-        if(it != _subsearches.end())
-        {
-            const Parameters& parameters = it->parameters;
-
-            const Parameters::const_iterator it2 = parameters.find(parameterName);
-            if(it2 != parameters.end())
-            {
-                const std::string& value = it2->second;
-                return value;
-            }
+            const std::string& value = it2->second;
+            return value;
         }
     }
 

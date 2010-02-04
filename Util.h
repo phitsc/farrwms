@@ -24,6 +24,7 @@ struct String
     static void UTF8Decode(const std::string& UTF8, std::string& Result);
 
     static void tolower(std::string& toConvert);
+    static std::string tolower_copy(const std::string& text);
     static bool equalsNoCase(const std::string& left, const std::string& right);
     static bool isAlpha(char character);
     static bool isAlphanumeric(char character);

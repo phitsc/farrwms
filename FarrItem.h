@@ -9,13 +9,15 @@
 
 struct ContextItem
 {
-    ContextItem(const std::string& caption_, const std::string& hint_, const std::string& path_, const std::string& iconPath_) :
+    ContextItem(const std::string& type_, const std::string& caption_, const std::string& hint_, const std::string& path_, const std::string& iconPath_) :
+        type(type_),
         caption(caption_),
         hint(hint_),
         path(path_),
         iconPath(iconPath_)
     {}
 
+    std::string type;
     std::string caption;
     std::string hint;
     std::string path;
