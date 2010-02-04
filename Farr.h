@@ -25,10 +25,11 @@ namespace farr
 
     struct MenuItem
     {
-        MenuItem(const std::string& caption_, const std::string& hint_, const std::string& iconPath_, const std::string& command_) :
-            caption(caption_), hint(hint_), iconPath(iconPath_), command(command_)
+        MenuItem(const std::string& type_, const std::string& caption_, const std::string& hint_, const std::string& iconPath_, const std::string& command_) :
+            type(type_), caption(caption_), hint(hint_), iconPath(iconPath_), command(command_)
         {}
 
+        std::string type;
         std::string caption;
         std::string hint;
         std::string iconPath;
@@ -37,6 +38,7 @@ namespace farr
     typedef std::vector<MenuItem> MenuItems;
 
     void addMenuItems(MenuType menuType, const MenuItems& menuItems);
+    void clearMenuItems();
 
     bool signalSearchStateChanged(bool isSearching, unsigned long itemCount = 0);
 

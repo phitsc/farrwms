@@ -58,6 +58,15 @@ void String::tolower(std::string& toConvert)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+std::string String::tolower_copy(const std::string& text)
+{
+    std::string temp(text);
+    tolower(temp);
+    return temp;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool String::equalsNoCase(const std::string& left, const std::string& right)
 {
     return (_strcmpi(left.c_str(), right.c_str()) == 0);

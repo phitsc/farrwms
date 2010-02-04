@@ -43,7 +43,7 @@ DAMAGE.
 <!--}}}-->
 
 <!--PRE-HEAD-END-->
-<title> FarrWebMetaSearch - 1.4.2 </title>
+<title> FarrWebMetaSearch - 1.5.0 </title>
 <style id="styleArea" type="text/css">
 #saveTest {display:none;}
 #messageArea {display:none;}
@@ -524,18 +524,18 @@ Also see [[AdvancedOptions]]</pre>
 <div title="Disclaimer" modifier="phitsc" created="201001082250" changecount="1">
 <pre>FarrWebMetaSearch is provided 'as is'. No warranty of any kind is expressed or implied. Use it at your own risk.</pre>
 </div>
-<div title="Introduction" modifier="phitsc" created="201001082252" modified="201001092058" changecount="15">
+<div title="Introduction" modifier="phitsc" created="201001082252" modified="201001292046" changecount="16">
 <pre>FarrWebMetaSearch is a generic web retrieval FARR plugin that show results in list mode. It is therefore targeted at web sites delivering list-like results. Results are selected using regular expressions. FarrWebMetaSearch searches live as you type!
 
 !!!Basic usage
 
 Type
 
-{{{  wms [search] [+option] [search term] }}}
+{{{  wms [search] [+subsearch] [search term] }}}
 
 to use a pre-configured search. 
 
-Typing +, - or / after the search name will display available options. {{{[+option]}}} is optional. It currently has to follow right after the search name.
+Typing +, - or / after the search name will display available subsearches. {{{[+subsearch]}}} is optional. It currently has to follow right after the search name.
 
 If {{{[search]}}} is configured as a web search, {{{[search term]}}} will be searched live as you type. If {{{[search]}}} is configured as a feed, {{{[search term]}}} will filter the found results. In this case {{{[search term]}}} is optional.
 
@@ -610,8 +610,8 @@ FarrWebMetaSearch can be used to search feeds. The behaviour is different to the
 
 A search defined as a feed will start searching as soon as one enters a space after the search name. Once the results are displayed, the search terms typed will narrow down the results to match the entered search terms. (note that starting to type search terms before the result items are displayed will currently stop the search).</pre>
 </div>
-<div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201001292021" changecount="8">
-<pre>1.4.2</pre>
+<div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201002042043" changecount="9">
+<pre>1.5.0</pre>
 </div>
 <div title="SiteTitle" modifier="phitsc" created="201001082227" changecount="1">
 <pre>FarrWebMetaSearch</pre>
@@ -626,8 +626,19 @@ A search defined as a feed will start searching as soon as one enters a space af
 * --Make additional links available via context menu entries--
 * Add many more searches :)</pre>
 </div>
-<div title="Version history" modifier="phitsc" created="201001082239" modified="201001292040" changecount="43">
-<pre>''1.4.2 - 29. January 2010''
+<div title="Version history" modifier="phitsc" created="201001082239" modified="201002042113" changecount="45">
+<pre>''1.5.0 - 4. February 2010''
+* implemented sortOrder parameter
+* implemented isHidden parameter
+* implemented context submenus
+* now supports up to 32 context menu items
+* now clears context menus for subsearches
+* subsearches / abbreviations are now case-insensitive
+* New / updated searches:
+** onelook (by Perry Mowbray)
+** timeanddate (by Perry Mowbray)
+
+''1.4.2 - 29. January 2010''
 * Now filters for subsearch abbreviations too
 * Added some logging capability. Type 'wms !' to enable / disable logging.
 * Added {{{%PLUGINALIAS%}}} variable
