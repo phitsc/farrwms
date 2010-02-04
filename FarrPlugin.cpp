@@ -238,7 +238,7 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
         FarrItem farrItem(caption, group, removeHttp(url), _currentSearch->getParameter(_currentSubsearchName, "farrIconPath"), FarrItem::Url);
 
-        for(unsigned long index = 1; index <= 9; ++index)
+        for(unsigned long index = 1; index <= Searches::MaxContextMenuItemCount; ++index)
         {
             const std::string contextCaption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextCaption" + util::String::toString(index)), variables)));
             if(contextCaption.empty())
@@ -375,7 +375,8 @@ void FarrPlugin::listCachedItems(const std::string& filter)
 
 void FarrPlugin::addSubsearchToResults(const Search& search, const Search::Subsearch& subsearch, const std::string& filter)
 {
-    if(!subsearch.name.empty() && (filter.empty() || util::String::startsWithNoCase(subsearch.name, filter) || util::String::startsWithNoCase(subsearch.abbreviation, filter)))
+    const bool isHidden = (search.getParameter(subsearch.name, "isHidden") == "true");
+    if(!isHidden && !subsearch.name.empty() && (filter.empty() || util::String::startsWithNoCase(subsearch.name, filter) || util::String::startsWithNoCase(subsearch.abbreviation, filter)))
     {
         const std::string caption = search.getName() + " +" + subsearch.name + (!subsearch.abbreviation.empty() ? " (" + subsearch.abbreviation + ")" : "");
         _farrItems.push_back(FarrItem(caption, search.getParameter(subsearch.name, "description"), _farrAlias + search.getName() + " +" + subsearch.name, search.getParameter(subsearch.name, "farrIconPath"), FarrItem::Alias));
