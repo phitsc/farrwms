@@ -19,7 +19,7 @@ public:
 
     typedef std::map<std::string, std::string> Parameters;
 
-    Parameters& addSubsearch(const std::string& optionName, const std::string& abbreviation);
+    Parameters& addSubsearch(const std::string& optionName, const std::string& abbreviation, long sortOrder);
 
 	bool hasName(const std::string& name) const;
     bool hasSubsearch(const std::string& subSearchNameOrAbbreviation) const;
@@ -32,12 +32,27 @@ public:
 
     struct Subsearch
     {
-        Subsearch(const std::string& name_, const std::string& abbreviation_) : name(name_), abbreviation(abbreviation_)
+        Subsearch(const std::string& name_, const std::string& abbreviation_, long sortOrder_) : name(name_), abbreviation(abbreviation_), sortOrder(sortOrder_)
         {}
 
         bool operator<(const Subsearch& subsearch) const
         {
-            return (name < subsearch.name);
+            if((sortOrder != 0) && (subsearch.sortOrder != 0))
+            {
+                return (sortOrder < subsearch.sortOrder);
+            }
+            else if((sortOrder != 0) && (subsearch.sortOrder == 0))
+            {
+                return true;
+            }
+            else if((sortOrder == 0) && (subsearch.sortOrder != 0))
+            {
+                return false;
+            }
+            else
+            {
+                return (name < subsearch.name);
+            }
         }
 
         bool equalsName(const std::string& optionName) const
@@ -52,6 +67,7 @@ public:
 
         std::string name;
         std::string abbreviation;
+        long        sortOrder;
 
         Parameters parameters;
     };
@@ -81,6 +97,11 @@ public:
 
 	const_iterator begin() const { return _searches.begin(); }
 	const_iterator end() const { return _searches.end(); }
+
+    enum
+    {
+        MaxContextMenuItemCount = 20
+    };
 
 private:
 	void addSearch(const std::string& searchFile);

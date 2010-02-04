@@ -64,7 +64,9 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
 
     if(isValidRegularExpression(search.getName(), optionName, pattern))
     {
-        Search::Parameters& parameters = search.addSubsearch(optionName, abbreviation);
+        const std::string sortOrder = iniFile.getParameterValue(categoryName, "sortOrder", "__UNDEF");
+
+        Search::Parameters& parameters = search.addSubsearch(optionName, abbreviation, (sortOrder == "__UNDEF") ? 0 : util::String::fromString<long>(sortOrder));
         assignProperty(parameters, "description", iniFile.getParameterValue(categoryName, "description", "__UNDEF"));
         assignProperty(parameters, "contributor", iniFile.getParameterValue(categoryName, "contributor", "__UNDEF"));
         assignProperty(parameters, "searchUrl", iniFile.getParameterValue(categoryName, "searchUrl", "__UNDEF"));
@@ -74,8 +76,9 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
         assignProperty(parameters, "farrGroup", iniFile.getParameterValue(categoryName, "farrGroup", "__UNDEF"));
         assignProperty(parameters, "farrPath", iniFile.getParameterValue(categoryName, "farrPath", "__UNDEF"));
         assignProperty(parameters, "farrIconPath", (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
+        assignProperty(parameters, "isHidden", iniFile.getParameterValue(categoryName, "isHidden", "__UNDEF"));
 
-        for(unsigned long index = 1; index <= 9; ++index)
+        for(unsigned long index = 1; index <= MaxContextMenuItemCount; ++index)
         {
             if(assignProperty(parameters, "contextCaption" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextCaption" + util::String::toString(index), "__UNDEF")))
             {
@@ -153,9 +156,9 @@ Search::Search(const std::string& name) :
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Search::Parameters& Search::addSubsearch(const std::string& optionName, const std::string& abbreviation)
+Search::Parameters& Search::addSubsearch(const std::string& optionName, const std::string& abbreviation, long sortOrder)
 {
-    return _subsearches.insert(Subsearch(optionName, abbreviation)).first->parameters;
+    return _subsearches.insert(Subsearch(optionName, abbreviation, sortOrder)).first->parameters;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -184,7 +187,9 @@ const std::string& Search::getParameter(const std::string& subsearchName, const 
         const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::equalsNameOrAbbreviation, _1, subsearchName));
         if(it != _subsearches.end())
         {
-            const Parameters& parameters = it->parameters;
+            const Subsearch& subsearch = *it;
+
+            const Parameters& parameters = subsearch.parameters;
 
             const Parameters::const_iterator it2 = parameters.find(parameterName);
             if(it2 != parameters.end())

@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=windows-1250">
+		<meta name="generator" content="PSPad editor, www.pspad.com">
+		<title>
+		</title>
+		<style type="text/css">
+			<!--
+						dt {font-weight: bold; margin-top: 5px;}
+						dt.subsearch { font-size: large; color: rgb(0,0,155); margin-top: 10px;}
+						span.contributor { float: right; font-style: italic; }
+						h1 {margin: 10px 0px 0px 0px}
+						//-->
+		</style>
+	</head>
+	<body><h1>Onelook Dictionary Search</h1>
+		<hr>
+		<span class="contributor">by Perry Mowbray [2010.01.27]
+		</span>
+		<p>FARR WebMetaSearch Onelook Dictionary search uses
+			<a href="http://www.onelook.com">OneLook.com</a> to display definitions, and/or name information, of the entered word.
+		</p>
+		<p>
+		<dl>
+		<dt class="subsearch">Openning OneLook</dt>
+		<dd>Double-Click to open the OneLook page in the default browser, or SHIFT-ENTER to open the OneLook page in the FARR window. The OneLook page has a wealth of other information about the word, alternatively you can access the same information with RMB Context Menu:</dd>
+		<dt class="subsearch">RMB Context Menu</dt>
+		<dd>Right-Mouse-Button click on an entry for the follow shortcuts:
+		<dl>
+		<dt>Words Defining '<i>Search Word</i>'</dt>
+		<dd>Perform a Reverse Lookup of the <i>Search Word</i></dd>
+		<dt>Copy</dt>
+		<dd>Copy the definition to the Clipboard</dd>
+		<dt>Dictionary Lists</dt>
+		<dd>Return a list of Dictionary entries for the <i>Search Word</i></dd>
+		</dl>
+		</dd>
+		</dl>
+		
+		</p>
+		<h1>SubSearches</h1>
+		OneLook WMS has the following subSearches, which are accessed by adding +&lt;subSearchName&gt; or +&lt;abbreviation&gt; before the search term.
+		<dl>
+			<dt class="subsearch">Reverse
+			</dt>
+			<dd><i>Abbreviation: <b>r</b></i>
+				<br>Find words or phrases related to the entered word(s). Patterns can be entered before a colon to filter results:
+				<dl>
+					<dt>
+						<a href="http://www.onelook.com/?w=:farr">farr</a>
+					</dt>
+					<dd>Find words and phrases that are related to <i>farr</i>
+					</dd>
+					<dt>
+						<a href="http://www.onelook.com/?w=f*%3Asearch">f*:search</a>
+					</dt>
+					<dd>Find any words related to <i>search</i> that start with <i>f</i>
+					</dd>
+					<dt>
+						<a href="http://www.onelook.com/?w=*%3Afind+and+run+robot">*:find and run robot</a>
+					</dt>
+					<dd>Find words and phrases related to the concept <i>find and run robot</i>
+					</dd>
+					<dt>
+						<a href="http://www.onelook.com/?w=*search *%3Afind+and+run+robot">*search *:find and run robot</a>
+					</dt>
+					<dd>Find phrases related to the concept <i>find and run robot</i> that have the word <i>search</i> in the result
+					</dd>
+				</dl>
+			</dd>
+			<dt class="subsearch">Expand
+				<dt>
+					<dd><i>Abbreviation: <b>e</b></i>
+						<br>Find phrases that spell out the entered word, for example:
+						<dl>
+							<dt>
+								<a href="http://www.onelook.com/?w=expand:farr">farr</a>
+							</dt>
+							<dd>Find phrases that spell out <i>farr</i>
+							</dd>
+						</dl>
+					</dd>
+					<dt class="subsearch">Phrase
+					</dt>
+					<dd><i>Abbreviation: <b>ph</b></i>
+						<br>Find phrases that contain the entered word or pattern:
+					<dl>
+						<dt>
+							<a href="http://www.onelook.com/?w=**sweet**">sweet</a>
+						</dt>
+						<dd>Find phrases that include <i>sweet</i>
+						</dd>
+						<dt>
+							<a href="http://www.onelook.com/?w=**short*sweet*">short*sweet</a>
+						</dt>
+						<dd>Find phrases that include <i>short</i> then <i>sweet</i>
+						</dd>
+					</dl>
+					</dd>
+					<dt class="subsearch">PhraseCommon
+					</dt>
+					<dd><i>Abbreviation: <b>phc</b></i>
+						<br>				Find <b>common</b> phrases that contain the entered word. Common is defined by OneLook as appearing in 3 or more dictionaries.
+				</dt>
+				<dt class="subsearch">PatternMatch
+				</dt>
+				<dd><i>Abbreviation: <b>pm</b></i>
+					<br>Find words and phrases that match the entered <a href="#pm" target="_self">pattern</a>:
+					<dl>
+						<dt>
+							<a href="http://www.onelook.com/?w=f%3F%3Fr">bl????rd</a>
+						</dt>
+						<dd>Find words that start with f and end with r, and have 2 letters in between
+						</dd>
+						<dt>
+							<a href="http://www.onelook.com/?w=farr*">farr*</a>
+						</dt>
+						<dd>Find words and phrases that start with <i>farr</i>
+						</dd>
+						<dt>
+							<a href="http://www.onelook.com/?w=*farr">*farr</a>
+						</dt>
+						<dd>Find words and phrases that end with <i>farr</i>
+						</dd>
+					</dl>
+				</dd>
+				<dt class="subsearch">PatternMatchCommon
+				</dt>
+				<dd><i>Abbreviation: <b>pmc</b></i>
+					<br>Find <b>common</b> words and phrases that match the entered <a href="#pm" target="_self">pattern</a>. Common is defined by OneLook as appearing in 3 or more dictionaries.
+				</dd>
+				<dt class="subsearch">Crossword
+				</dt>
+				<dd><i>Abbreviation: <b>cw</b></i>
+					<br>Find words and phrases that match the entered <a href="#pm" target="_self">pattern</a> using Crossword matching. 
+					<p>
+      		By default, the "?" wildcard matches any single character, including spaces and punctuation. Using crossword puzzle SubSearch limits the match to "letters only"; also every pattern search is assumed to allow optional spaces between letters. This allows you to find phrases that are run together (as they would appear in a crossword puzzle) without having to worry about where the spaces would go. For example, searching for "h?ttot?ot" will find "hot to trot" in this mode, and "a?ric??li??" will find "African lily".
+     </p>
+
+				</dd>
+				<dt class="subsearch">Name
+				</dt>
+				<dd><i>Abbreviation: <b>n</b></i>
+					<br>Find names that match entered word.
+				</dd>
+				<dt class="subsearch">Dictionaries
+				</dt>
+				<dd><i>Abbreviation: <b>d</b></i>
+					<br>Find dictionary entries with the entered word.
+					<p>Specialist dictionary shortcuts are also found in the RMB Context Menu</p>
+				</dd>
+				<dt class="subsearch">Words of the Day
+				</dt>
+				<dd><i>Abbreviation: <b>w</b></i>
+					<br>Every hour a computer program selects five words that get an unusually large number of searches on OneLook.com. 					These words tend to reflect topics that have appeared in the world news or in discussion groups across the Web. 					Each morning the top word is featured as the Word of the Day on the
+					<a href="http://www.onelook.com/">OneLook home page</a>. 					An archive of the daily words is
+					<a href="http://www.onelook.com/wotd-archive.shtml">available here</a>.
+					<br>
+					<br>					The top five daily words, as well as the top five words for the current hour, are returned with this subSearch.
+				</dd>
+		</dl>
+		<p><h1 id="pm">Pattern Matching</h1>
+			<hr>		Patthern matching can be used with Reverse, MatchAll & MatchCommon subSearches.
+			<dl>
+				<dt><b>*</b> The asterisk
+				</dt>
+				<dd>matches any number of characters. That means that you can use it as a placeholder for any sequence of letters or symbols. For example, if you enter blueb* you'll get all the terms that start with "blueb"; if you enter *bird you'll get all the terms that end with "bird"; if you enter *lueb* you'll get all the terms that contain the sequence "lueb", and so forth. An asterisk can match zero characters, too.
+				</dd>
+				<dt><b>?</b> The question mark
+				</dt>
+				<dd>matches exactly one character. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word "Lebanon".
+				</dd>
+				<dt><b>#</b> The number-sign
+				</dt>
+				<dd>matches any English consonant. For example, the query tra#t finds the word "tract" but not "trait".
+				</dd>
+				<dt><b>@</b> The at-sign
+				</dt>
+				<dd>matches any English vowel. For example, the query abo@t finds the word "about" but not "abort".
+				</dd>
+			</dl>
+		</p>
+	</body>
+</html>
