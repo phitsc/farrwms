@@ -50,7 +50,7 @@ BEGIN
             VALUE "OriginalFilename", "FarrWebMetaSearch.dll"
             VALUE "ProductName", "FARR Web Meta Search Plugin"
             VALUE "ProductVersion", "1.5.0"
-            VALUE "SpecialBuild", "4. February 2010"
+            VALUE "SpecialBuild", "5. February 2010"
         END
     END
     BLOCK "VarFileInfo"
