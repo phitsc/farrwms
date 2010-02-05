@@ -230,20 +230,21 @@ const std::string Search::getInfoAsHtml() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Search::getSubsearchInfoAsHtml(const Subsearch& option, std::stringstream& stream) const
+void Search::getSubsearchInfoAsHtml(const Subsearch& subsearch, std::stringstream& stream) const
 {
-    if(!option.name.empty())
+    const bool isHidden = (getParameter(subsearch.name, "isHidden") == "true");
+    if(!subsearch.name.empty() && !isHidden)
     {
-        stream << "<li><i>" << option.name;
-        if(!option.abbreviation.empty())
+        stream << "<li><i>" << subsearch.name;
+        if(!subsearch.abbreviation.empty())
         {
-            stream << " (" << option.abbreviation << ")";
+            stream << " (" << subsearch.abbreviation << ")";
         }
         
         stream << "</i>";
 
-        const Parameters::const_iterator it2 = option.parameters.find("description");
-        if(it2 != option.parameters.end())
+        const Parameters::const_iterator it2 = subsearch.parameters.find("description");
+        if(it2 != subsearch.parameters.end())
         {
             stream << " : " << it2->second; 
         }

@@ -511,12 +511,13 @@ Also see [[AdvancedOptions]]</pre>
 </div>
 <!--POST-SHADOWAREA-->
 <div id="storeArea">
-<div title="Credits" modifier="phitsc" created="201001082248" modified="201001092135" changecount="5">
+<div title="Credits" modifier="phitsc" created="201001082248" modified="201002052154" changecount="6">
 <pre>Thanks! to
 * Carroll (hamradio on donationcoder.com forums) for designing the icons
 * everyone who gave me feedback on the [[NANY 2010|http://www.donationcoder.com/Forums/bb/index.php?topic=20951.0]] event
 * the search contributors:
-** Perry Mowbray</pre>
+** Perry Mowbray
+** ewemoa</pre>
 </div>
 <div title="DefaultTiddlers" modifier="phitsc" created="201001082231" changecount="1">
 <pre>[[Introduction]]</pre>
@@ -551,13 +552,13 @@ Type {{{ wms ? }}} to open this help file in an external browser.
 [[Credits]]
 [[Disclaimer]]</pre>
 </div>
-<div title="Search config files" modifier="phitsc" created="201001092100" modified="201001292039" changecount="13">
-<pre>New searches can be added to the FarrWebMetaSearch plugin by adding search configuration files. Search configuration files have the {{{.config}}} file extension and have to be in the plugin's {{{searches}}} subdirectory.
+<div title="Search config files" modifier="phitsc" created="201001092100" modified="201002052157" changecount="18">
+<pre>New searches can be added to the FarrWebMetaSearch plugin by adding search configuration files. Search configuration files have the {{{.conf}}} file extension and have to be in the plugin's {{{searches}}} subdirectory.
 
 !Basics
-The .config file format is similar to that of .ini files. Lines starting with a semicolon character are not considered part of the configuration (they are treated as comments).
+The .conf file format is similar to that of .ini files. Lines starting with a semicolon character are not considered part of the configuration (they are treated as comments).
 
-The name of the file (without the .config extension) defines the name of the search.
+The name of the file (without the .conf extension) defines the name of the search.
 
 !Parameters
 Parameter names (on the left of the =) are case sensitive.
@@ -572,6 +573,7 @@ A basic search configuration file should have the following parameters defined:
 | farrCaption | Caption of result item |
 | farrGroup | Smaller line beneath the caption of the result item |
 | farrPath | URL which is launched when triggering a result item |
+| contextType1..9 | Type of context menu item. Can be one of: {{{item, submenu, endmenu, separator}}}. Defaults to {{{item}}}. |
 | contextCaption1..9 | Caption of context menu item |
 | contextIcon1..9 | Icon filename for context menu item. Icon must be in searches subdirectory. Make sure to choose a unique name. |
 | contextHint1..9 | Hint displayed in status bar when context menu item is selected |
@@ -592,7 +594,7 @@ The farrCaption, farrGroup, farrPath as well as the context menu parameters can 
 
 !Example
 
-msdn.config
+msdn.conf
 
 {{{
 description=Microsoft Developer Network
@@ -603,8 +605,8 @@ farrGroup=$2
 farrPath=$3
 }}}
 
-!Feeds
-FarrWebMetaSearch can be used to search feeds. The behaviour is different to the live searches though. To defined a feed, add the isFeed parameter to the .config file:
+!Feeds and static pages
+FarrWebMetaSearch can be used to search feeds and static pages. The behaviour is different to the live searches though. To defined a feed, add the isFeed parameter to the .conf file:
 
 {{{isFeed=true}}}
 
@@ -626,17 +628,22 @@ A search defined as a feed will start searching as soon as one enters a space af
 * --Make additional links available via context menu entries--
 * Add many more searches :)</pre>
 </div>
-<div title="Version history" modifier="phitsc" created="201001082239" modified="201002042113" changecount="45">
-<pre>''1.5.0 - 4. February 2010''
+<div title="Version history" modifier="phitsc" created="201001082239" modified="201002052200" changecount="53">
+<pre>''1.5.0 - 5. February 2010''
 * implemented sortOrder parameter
 * implemented isHidden parameter
 * implemented context submenus
-* now supports up to 32 context menu items
+* now supports more than 9 context menu items
 * now clears context menus for subsearches
 * subsearches / abbreviations are now case-insensitive
+* now prints the number of listed searches in the status bar
+* updated help file
 * New / updated searches:
 ** onelook (by Perry Mowbray)
 ** timeanddate (by Perry Mowbray)
+** autohotkey (ewemoa)
+** cheatsheet
+** amazon (fixed typo)
 
 ''1.4.2 - 29. January 2010''
 * Now filters for subsearch abbreviations too

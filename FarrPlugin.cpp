@@ -180,11 +180,13 @@ void FarrPlugin::search(const char* rawSearchString)
 
             if(hasSpaceAfterAlias && searchString.empty())
             {
-                farr::setStatusText("Type ? and hit enter to show help file.");
+
+
+                farr::setStatusText(std::string("Type ? and hit enter to show help file. ") + ((_farrItems.size() > 1) ? (util::String::toString(_farrItems.size()) + " searches.") : ""));
             }
             else
             {
-                farr::setStatusText("Hit Shift + Enter to display info about search.");
+                farr::setStatusText(std::string("Hit Shift + Enter to display info about search. ") + ((_farrItems.size() > 1) ? (util::String::toString(_farrItems.size()) + " searches.") : ""));
             }
         }
     }
