@@ -131,7 +131,7 @@ void FarrPlugin::search(const char* rawSearchString)
                     {
                         _farrItemCache.clear();
 
-                        const std::string searchUrl = _currentSearch->getParameter(_currentSubsearchName, "searchUrl");
+                        const std::string searchUrl = util::String::escapeUrl(_currentSearch->getParameter(_currentSubsearchName, "searchUrl"));
 
                         _logFile.writeLine("Search URL: '" + searchUrl + "'");
 
@@ -157,7 +157,7 @@ void FarrPlugin::search(const char* rawSearchString)
                         Variables variables;
                         variables["%SEARCHTERM%"] = _currentSearchTerm;
 
-                        const std::string searchUrl = containsSearchTermVariable ? replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "searchUrl"), variables) : (_currentSearch->getParameter(_currentSubsearchName, "searchUrl") + _currentSearchTerm);
+                        const std::string searchUrl = util::String::escapeUrl(containsSearchTermVariable ? replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "searchUrl"), variables) : (_currentSearch->getParameter(_currentSubsearchName, "searchUrl") + _currentSearchTerm));
 
                         _logFile.writeLine("Search URL: '" + searchUrl + "'");
 

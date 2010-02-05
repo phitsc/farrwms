@@ -335,6 +335,51 @@ void String::copyString(char* buffer, int maxLength, const std::string& string)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool String::isEscapeChar(char character)
+{
+    if(character == '+')
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string String::escapeUrl(const std::string& url)
+{
+    const std::string::size_type pos = url.find_first_of("#?");
+
+    if(pos != std::string::npos)
+    {
+        std::stringstream result;
+        result << url.substr(0, pos + 1);
+
+        for(std::string::size_type index = pos + 1; index < url.length(); ++index)
+        {
+            if(isEscapeChar(url[index]))
+            {
+                result << '%' << std::hex << (long)url[index];
+            }
+            else
+            {
+                result << url[index];
+            }
+        }
+
+        return result.str();
+    }
+    else
+    {
+        return url;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VersionInfo::initialize(const char* filename)
 {
     typedef std::vector<std::string> Strings;

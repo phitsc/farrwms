@@ -90,6 +90,9 @@ struct String
     static std::string quoteSpaces(const std::string& text);
 
     static void copyString(char* buffer, int maxLength, const std::string& string);
+
+    static bool isEscapeChar(char character);
+    static std::string String::escapeUrl(const std::string& url);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
