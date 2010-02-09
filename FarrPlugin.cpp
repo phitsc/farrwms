@@ -251,7 +251,8 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
         {
             std::string contextType = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextType" + util::String::toString(index)), variables)));
             const std::string contextCaption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextCaption" + util::String::toString(index)), variables)));
-            if(contextType.empty() && contextCaption.empty())
+            const std::string contextPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextPath" + util::String::toString(index)), variables)));
+            if(contextType.empty() && (contextCaption.empty() || contextPath.empty()))
             {
                 break;
             }
@@ -266,7 +267,6 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
             }
 
             const std::string contextHint = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextHint" + util::String::toString(index)), variables)));
-            const std::string contextPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextPath" + util::String::toString(index)), variables)));
             const std::string contextIconPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextIcon" + util::String::toString(index)), variables)));
 
             farrItem.contextItems.push_back(ContextItem(contextType, contextCaption, contextHint, contextPath, contextIconPath));
@@ -277,13 +277,41 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
     _farrItemCache = _farrItems;
 
+    // add statusbar icons
+    farr::MenuItems menuItems;
+
     if((long)_farrItems.size() > farr::getMaxResults())
     {
-        farr::MenuItems menuItems;
         menuItems.push_back(farr::MenuItem("item", "Show more results", "Show more results", _iconPath + "Down_small.ico", "dosearch " + _farrAlias + "!showAllItems"));
-        farr::addMenuItems(farr::Statusbar, menuItems);
     }
 
+    for(unsigned long index = 1; index <= Searches::MaxStatusIconCount; ++index)
+    {
+        const std::string statusCaptionPattern = replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusCaptionPattern" + util::String::toString(index)), variables);
+        if(statusCaptionPattern.empty())
+        {
+            break;
+        }
+
+        const std::tr1::regex expression(statusCaptionPattern);
+        std::tr1::smatch match;
+        if(std::tr1::regex_match(responseText, match, expression))
+        {
+            const std::string statusCaption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusCaption" + util::String::toString(index)), variables)));
+            const std::string statusPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusPath" + util::String::toString(index)), variables)));
+            if(!statusCaption.empty() && !statusPath.empty())
+            {
+                const std::string statusHint = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusHint" + util::String::toString(index)), variables)));
+                const std::string statusIcon = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusIcon" + util::String::toString(index)), variables)));
+
+                menuItems.push_back(farr::MenuItem("item", statusCaption, statusHint, statusIcon, statusPath));
+            }
+        }
+    }
+
+    farr::addMenuItems(farr::Statusbar, menuItems);
+
+    //
     std::stringstream stream;
     stream << "Found " << _farrItems.size() << " results";
     _logFile.writeLine(stream.str());

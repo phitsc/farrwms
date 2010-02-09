@@ -51,54 +51,57 @@ void Searches::addSearch(const std::string& searchFile)
 void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std::string& categoryName, const std::string& iconPath)
 {
     const std::string::size_type pos = categoryName.find('|');
-    const std::string optionName = (pos == std::string::npos) ? categoryName : categoryName.substr(0, pos);
+    const std::string subsearchName = (pos == std::string::npos) ? categoryName : categoryName.substr(0, pos);
     const std::string abbreviation = (pos == std::string::npos) ? "" : categoryName.substr(pos + 1);
 
     char categoryIconPath[MAX_PATH] = { 0 };
     PathAppend(categoryIconPath, iconPath.c_str());
     PathRemoveExtension(categoryIconPath);
-    PathAppend(categoryIconPath, std::string("-" + optionName).c_str());
+    PathAppend(categoryIconPath, std::string("-" + subsearchName).c_str());
     PathAddExtension(categoryIconPath, ".ico");
 
     const std::string pattern = iniFile.getParameterValue(categoryName, "resultPattern", "__UNDEF");
 
-    if(isValidRegularExpression(search.getName(), optionName, pattern))
+    if(isValidRegularExpression(search.getName(), subsearchName, pattern))
     {
         const std::string sortOrder = iniFile.getParameterValue(categoryName, "sortOrder", "__UNDEF");
 
-        Search::Parameters& parameters = search.addSubsearch(optionName, abbreviation, (sortOrder == "__UNDEF") ? 0 : util::String::fromString<long>(sortOrder));
-        assignProperty(parameters, "description", iniFile.getParameterValue(categoryName, "description", "__UNDEF"));
-        assignProperty(parameters, "contributor", iniFile.getParameterValue(categoryName, "contributor", "__UNDEF"));
-        assignProperty(parameters, "searchUrl", iniFile.getParameterValue(categoryName, "searchUrl", "__UNDEF"));
+        Search::Parameters& parameters = search.addSubsearch(subsearchName, abbreviation, (sortOrder == "__UNDEF") ? 0 : util::String::fromString<long>(sortOrder));
+        assignProperty(parameters, "description", iniFile, categoryName);
+        assignProperty(parameters, "contributor", iniFile, categoryName);
+        assignProperty(parameters, "searchUrl", iniFile, categoryName);
         assignProperty(parameters, "isFeed", iniFile.getParameterValue(categoryName, "isFeed", "false"));
         assignProperty(parameters, "resultPattern", pattern);
-        assignProperty(parameters, "farrCaption", iniFile.getParameterValue(categoryName, "farrCaption", "__UNDEF"));
-        assignProperty(parameters, "farrGroup", iniFile.getParameterValue(categoryName, "farrGroup", "__UNDEF"));
-        assignProperty(parameters, "farrPath", iniFile.getParameterValue(categoryName, "farrPath", "__UNDEF"));
+        assignProperty(parameters, "farrCaption", iniFile, categoryName);
+        assignProperty(parameters, "farrGroup", iniFile, categoryName);
+        assignProperty(parameters, "farrPath", iniFile, categoryName);
         assignProperty(parameters, "farrIconPath", (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
-        assignProperty(parameters, "isHidden", iniFile.getParameterValue(categoryName, "isHidden", "__UNDEF"));
+        assignProperty(parameters, "isHidden", iniFile, categoryName);
 
         for(unsigned long index = 1; index <= MaxContextMenuItemCount; ++index)
         {
-            const bool hasType    = assignProperty(parameters, "contextType" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextType" + util::String::toString(index), "__UNDEF"));
-            const bool hasCaption = assignProperty(parameters, "contextCaption" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextCaption" + util::String::toString(index), "__UNDEF"));
+            const bool hasType    = assignProperty(parameters, "contextType" + util::String::toString(index), iniFile, categoryName);
+            const bool hasCaption = assignProperty(parameters, "contextCaption" + util::String::toString(index), iniFile, categoryName);
             if(hasType || hasCaption)
             {
-                assignProperty(parameters, "contextHint" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextHint" + util::String::toString(index), "__UNDEF"));
-                assignProperty(parameters, "contextPath" + util::String::toString(index), iniFile.getParameterValue(categoryName, "contextPath" + util::String::toString(index), "__UNDEF"));
+                assignProperty(parameters, "contextHint" + util::String::toString(index), iniFile, categoryName);
+                assignProperty(parameters, "contextPath" + util::String::toString(index), iniFile, categoryName);
+                assignIconProperty(parameters, "contextIcon" + util::String::toString(index), iniFile, categoryName, iconPath);
+            }
+            else
+            {
+                break;
+            }
+        }
 
-                std::string iconName = iniFile.getParameterValue(categoryName, "contextIcon" + util::String::toString(index), "__UNDEF");
-                if(iconPath != "__UNDEF")
-                {
-                    char contextIconPath[MAX_PATH] = { 0 };
-                    PathAppend(contextIconPath, iconPath.c_str());
-                    PathRemoveFileSpec(contextIconPath);
-                    PathAppend(contextIconPath, iconName.c_str());
-                    if(PathFileExists(contextIconPath) == TRUE)
-                    {
-                        assignProperty(parameters, "contextIcon" + util::String::toString(index), contextIconPath);
-                    }
-                }
+        for(unsigned long index = 1; index <= MaxStatusIconCount; ++index)
+        {
+            if(assignProperty(parameters, "statusCaptionPattern" + util::String::toString(index), iniFile, categoryName))
+            {
+                assignProperty(parameters, "statusCaption" + util::String::toString(index), iniFile, categoryName);
+                assignProperty(parameters, "statusHint" + util::String::toString(index), iniFile, categoryName);
+                assignProperty(parameters, "statusPath" + util::String::toString(index), iniFile, categoryName);
+                assignIconProperty(parameters, "statusIcon" + util::String::toString(index), iniFile, categoryName, iconPath);
             }
             else
             {
@@ -145,6 +148,31 @@ bool Searches::isValidRegularExpression(const std::string& searchName, const std
     }
 
     return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool Searches::assignProperty(Search::Parameters& parameters, const std::string& parameterName, const IniFile& iniFile, const std::string& categoryName)
+{
+    return assignProperty(parameters, parameterName, iniFile.getParameterValue(categoryName, parameterName, "__UNDEF"));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Searches::assignIconProperty(Search::Parameters& parameters, const std::string& parameterName, const IniFile& iniFile, const std::string& categoryName, const std::string& searchIconPath)
+{
+    const std::string iconName = iniFile.getParameterValue(categoryName, parameterName, "__UNDEF");
+    if(iconName != "__UNDEF")
+    {
+        char iconPath[MAX_PATH] = { 0 };
+        PathAppend(iconPath, searchIconPath.c_str());
+        PathRemoveFileSpec(iconPath);
+        PathAppend(iconPath, iconName.c_str());
+        if(PathFileExists(iconPath) == TRUE)
+        {
+            assignProperty(parameters, parameterName, iconPath);
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

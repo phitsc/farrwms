@@ -109,7 +109,8 @@ public:
 
     enum
     {
-        MaxContextMenuItemCount = 32
+        MaxContextMenuItemCount = 50,
+        MaxStatusIconCount = 15
     };
 
 private:
@@ -118,6 +119,8 @@ private:
     static bool isValidRegularExpression(const std::string& searchName, const std::string& optionName, const std::string& pattern);
 	static std::string findIconPath(const std::string& searchFile);
 
+    static bool assignProperty(Search::Parameters& parameters, const std::string& parameterName, const IniFile& iniFile, const std::string& categoryName);
+    static void assignIconProperty(Search::Parameters& parameters, const std::string& parameterName, const IniFile& iniFile, const std::string& categoryName, const std::string& searchIconPath);
     static bool assignProperty(Search::Parameters& parameters, const std::string& parameterName, const std::string& value)
     {
         if(value != "__UNDEF")
