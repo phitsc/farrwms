@@ -180,8 +180,6 @@ void FarrPlugin::search(const char* rawSearchString)
 
             if(hasSpaceAfterAlias && searchString.empty())
             {
-
-
                 farr::setStatusText(std::string("Type ? and hit enter to show help file. ") + ((_farrItems.size() > 1) ? (util::String::toString(_farrItems.size()) + " searches.") : ""));
             }
             else
@@ -240,8 +238,19 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     for( ; it != end; ++it)
     {
         const std::tr1::smatch match = *it;
+        std::tr1::smatch captionMatch;
 
-        const std::string caption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "farrCaption"), variables)));
+        const std::string captionInput = _currentSearch->getParameter(_currentSubsearchName, "farrCaptionInput");
+        const std::string captionPattern = _currentSearch->getParameter(_currentSubsearchName, "farrCaptionPattern");
+        if(!captionInput.empty() && !captionPattern.empty())
+        {
+            std::tr1::regex captionRegex(replaceCharacterEntityReferences(match.format(replaceVariables(captionPattern, variables))));
+            std::tr1::regex_search(replaceCharacterEntityReferences(match.format(replaceVariables(captionInput, variables))), captionMatch, captionRegex);
+        }
+
+        const std::tr1::smatch& captionMatchToUse = captionMatch.empty() ? match : captionMatch;
+        const std::string caption = replaceCharacterEntityReferences(captionMatchToUse.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "farrCaption"), variables)));
+
         const std::string group = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "farrGroup"), variables)));
         const std::string url = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "farrPath"), variables)));
 

@@ -72,9 +72,19 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
         assignProperty(parameters, "searchUrl", iniFile, categoryName);
         assignProperty(parameters, "isFeed", iniFile.getParameterValue(categoryName, "isFeed", "false"));
         assignProperty(parameters, "resultPattern", pattern);
+
+        assignProperty(parameters, "farrCaptionInput", iniFile, categoryName);
+        assignProperty(parameters, "farrCaptionPattern", iniFile, categoryName);
         assignProperty(parameters, "farrCaption", iniFile, categoryName);
+
+        assignProperty(parameters, "farrGroupInput", iniFile, categoryName);
+        assignProperty(parameters, "farrGroupPattern", iniFile, categoryName);
         assignProperty(parameters, "farrGroup", iniFile, categoryName);
+
+        assignProperty(parameters, "farrPathInput", iniFile, categoryName);
+        assignProperty(parameters, "farrPathPattern", iniFile, categoryName);
         assignProperty(parameters, "farrPath", iniFile, categoryName);
+
         assignProperty(parameters, "farrIconPath", (PathFileExists(categoryIconPath) == TRUE) ? categoryIconPath : iconPath);
         assignProperty(parameters, "isHidden", iniFile, categoryName);
 
@@ -84,8 +94,17 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
             const bool hasCaption = assignProperty(parameters, "contextCaption" + util::String::toString(index), iniFile, categoryName);
             if(hasType || hasCaption)
             {
+                assignProperty(parameters, "contextCaptionInput" + util::String::toString(index), iniFile, categoryName);
+                assignProperty(parameters, "contextCaptionPattern" + util::String::toString(index), iniFile, categoryName);
+
+                assignProperty(parameters, "contextHintInput" + util::String::toString(index), iniFile, categoryName);
+                assignProperty(parameters, "contextHintInput" + util::String::toString(index), iniFile, categoryName);
                 assignProperty(parameters, "contextHint" + util::String::toString(index), iniFile, categoryName);
+
+                assignProperty(parameters, "contextPathInput" + util::String::toString(index), iniFile, categoryName);
+                assignProperty(parameters, "contextPathPattern" + util::String::toString(index), iniFile, categoryName);
                 assignProperty(parameters, "contextPath" + util::String::toString(index), iniFile, categoryName);
+
                 assignIconProperty(parameters, "contextIcon" + util::String::toString(index), iniFile, categoryName, iconPath);
             }
             else
