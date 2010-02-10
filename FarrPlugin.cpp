@@ -242,10 +242,11 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
         const std::string captionInput = _currentSearch->getParameter(_currentSubsearchName, "farrCaptionInput");
         const std::string captionPattern = _currentSearch->getParameter(_currentSubsearchName, "farrCaptionPattern");
+        const std::string captionInputString = captionInput.empty() ? "" : replaceCharacterEntityReferences(match.format(replaceVariables(captionInput, variables)));
         if(!captionInput.empty() && !captionPattern.empty())
         {
             std::tr1::regex captionRegex(replaceCharacterEntityReferences(match.format(replaceVariables(captionPattern, variables))));
-            std::tr1::regex_search(replaceCharacterEntityReferences(match.format(replaceVariables(captionInput, variables))), captionMatch, captionRegex);
+            std::tr1::regex_search(captionInputString, captionMatch, captionRegex);
         }
 
         const std::tr1::smatch& captionMatchToUse = captionMatch.empty() ? match : captionMatch;
