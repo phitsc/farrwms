@@ -280,11 +280,6 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     // add statusbar icons
     farr::MenuItems menuItems;
 
-    if((long)_farrItems.size() > farr::getMaxResults())
-    {
-        menuItems.push_back(farr::MenuItem("item", "Show more results", "Show more results", _iconPath + "Down_small.ico", "dosearch " + _farrAlias + "!showAllItems"));
-    }
-
     for(unsigned long index = 1; index <= Searches::MaxStatusIconCount; ++index)
     {
         const std::string statusCaptionPattern = replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusCaptionPattern" + util::String::toString(index)), variables);
@@ -295,7 +290,7 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
 
         const std::tr1::regex expression(statusCaptionPattern);
         std::tr1::smatch match;
-        if(std::tr1::regex_match(responseText, match, expression))
+        if(std::tr1::regex_search(responseText, match, expression))
         {
             const std::string statusCaption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusCaption" + util::String::toString(index)), variables)));
             const std::string statusPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusPath" + util::String::toString(index)), variables)));
@@ -307,6 +302,11 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
                 menuItems.push_back(farr::MenuItem("item", statusCaption, statusHint, statusIcon, statusPath));
             }
         }
+    }
+
+    if((long)_farrItems.size() > farr::getMaxResults())
+    {
+        menuItems.push_back(farr::MenuItem("item", "Show more results", "Show more results", _iconPath + "Down_small.ico", "dosearch " + _farrAlias + "!showAllItems"));
     }
 
     farr::addMenuItems(farr::Statusbar, menuItems);
