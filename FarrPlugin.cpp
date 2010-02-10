@@ -238,22 +238,10 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     for( ; it != end; ++it)
     {
         const std::tr1::smatch match = *it;
-        std::tr1::smatch captionMatch;
-
-        const std::string captionInput = _currentSearch->getParameter(_currentSubsearchName, "farrCaptionInput");
-        const std::string captionPattern = _currentSearch->getParameter(_currentSubsearchName, "farrCaptionPattern");
-        const std::string captionInputString = captionInput.empty() ? "" : replaceCharacterEntityReferences(match.format(replaceVariables(captionInput, variables)));
-        if(!captionInput.empty() && !captionPattern.empty())
-        {
-            std::tr1::regex captionRegex(replaceCharacterEntityReferences(match.format(replaceVariables(captionPattern, variables))));
-            std::tr1::regex_search(captionInputString, captionMatch, captionRegex);
-        }
-
-        const std::tr1::smatch& captionMatchToUse = captionMatch.empty() ? match : captionMatch;
-        const std::string caption = replaceCharacterEntityReferences(captionMatchToUse.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "farrCaption"), variables)));
-
-        const std::string group = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "farrGroup"), variables)));
-        const std::string url = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "farrPath"), variables)));
+        
+        const std::string caption = getValue("farrCaption", match, variables);
+        const std::string group = getValue("farrGroup", match, variables);
+        const std::string url = getValue("farrPath", match, variables);
 
         FarrItem farrItem(caption, group, removeHttp(url), _currentSearch->getParameter(_currentSubsearchName, "farrIconPath"), FarrItem::Url);
 
@@ -327,6 +315,24 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
     _logFile.writeLine(stream.str());
 
     _isSearching = farr::signalSearchStateChanged(false, getItemCount());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string FarrPlugin::getValue(const std::string& parameterName, const std::tr1::smatch& match, const Variables& variables)
+{
+    std::tr1::smatch secondMatch;
+    const std::string input = _currentSearch->getParameter(_currentSubsearchName, parameterName + "Input");
+    const std::string pattern = _currentSearch->getParameter(_currentSubsearchName, parameterName + "Pattern");
+    const std::string inputString = (input.empty() || pattern.empty()) ? "" : replaceCharacterEntityReferences(match.format(replaceVariables(input, variables)));
+    if(!inputString.empty())
+    {
+        std::tr1::regex regex(replaceCharacterEntityReferences(match.format(replaceVariables(pattern, variables))));
+        std::tr1::regex_search(inputString, secondMatch, regex);
+    }
+
+    const std::tr1::smatch& matchToUse = secondMatch.empty() ? match : secondMatch;
+    return replaceCharacterEntityReferences(matchToUse.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, parameterName), variables)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,7 @@
 
 #include <string>
 #include <map>
+#include <regex>
 #include <windows.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,6 +76,8 @@ private:
     void clearResults();
 
     typedef std::map<std::string, std::string> Variables;
+
+    std::string getValue(const std::string& parameterName, const std::tr1::smatch& match, const Variables& variables);
 
     static void splitSearch(const std::string& searchString, std::string& searchName, std::string& optionName, std::string& searchTerm, bool& hasSubsearch);
     static std::string replaceCharacterEntityReferences(const std::string& text);
