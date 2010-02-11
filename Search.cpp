@@ -98,7 +98,7 @@ void Searches::addItemToSearch(Search& search, const IniFile& iniFile, const std
                 assignProperty(parameters, "contextCaptionPattern" + util::String::toString(index), iniFile, categoryName);
 
                 assignProperty(parameters, "contextHintInput" + util::String::toString(index), iniFile, categoryName);
-                assignProperty(parameters, "contextHintInput" + util::String::toString(index), iniFile, categoryName);
+                assignProperty(parameters, "contextHintPattern" + util::String::toString(index), iniFile, categoryName);
                 assignProperty(parameters, "contextHint" + util::String::toString(index), iniFile, categoryName);
 
                 assignProperty(parameters, "contextPathInput" + util::String::toString(index), iniFile, categoryName);

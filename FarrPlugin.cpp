@@ -248,8 +248,8 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
         for(unsigned long index = 1; index <= Searches::MaxContextMenuItemCount; ++index)
         {
             std::string contextType = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextType" + util::String::toString(index)), variables)));
-            const std::string contextCaption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextCaption" + util::String::toString(index)), variables)));
-            const std::string contextPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextPath" + util::String::toString(index)), variables)));
+            const std::string contextCaption = getValue("contextCaption" + util::String::toString(index), match, variables);
+            const std::string contextPath = getValue("contextPath" + util::String::toString(index), match, variables);
             if(contextType.empty() && (contextCaption.empty() || contextPath.empty()))
             {
                 break;
@@ -264,7 +264,7 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
                 break;
             }
 
-            const std::string contextHint = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextHint" + util::String::toString(index)), variables)));
+            const std::string contextHint = getValue("contextHint" + util::String::toString(index), match, variables);
             const std::string contextIconPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "contextIcon" + util::String::toString(index)), variables)));
 
             farrItem.contextItems.push_back(ContextItem(contextType, contextCaption, contextHint, contextPath, contextIconPath));
@@ -571,8 +571,8 @@ std::string FarrPlugin::replaceCharacterEntityReferences(const std::string& text
 		}
 
 		const std::string charCode = temp.substr(pos + 2, pos2 - (pos + 2));
-		const char character = static_cast<const char>(util::String::fromString<int>(charCode));
-		if(character >= 32 && character < 127)
+		const unsigned char character = static_cast<const unsigned char>(util::String::fromString<int>(charCode));
+		if(character >= 32 && character < 255)
 		{
 			temp.replace(pos, pos2 - pos + 1, std::string(1, character));
 		}
@@ -587,7 +587,6 @@ std::string FarrPlugin::replaceCharacterEntityReferences(const std::string& text
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&lt;"), std::string("<"));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&gt;"), std::string(">"));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&reg;"), std::string("®"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&#174;"), std::string("®"));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&copy;"), std::string("©"));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&nbsp;"), std::string(" "));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&nbsp;"), std::string(" "));
