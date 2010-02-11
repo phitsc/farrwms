@@ -325,13 +325,13 @@ std::string FarrPlugin::getValue(const std::string& parameterName, const std::tr
     const std::string input = _currentSearch->getParameter(_currentSubsearchName, parameterName + "Input");
     const std::string pattern = _currentSearch->getParameter(_currentSubsearchName, parameterName + "Pattern");
     const std::string inputString = (input.empty() || pattern.empty()) ? "" : replaceCharacterEntityReferences(match.format(replaceVariables(input, variables)));
-    if(!inputString.empty())
+    if(!input.empty() && !pattern.empty())
     {
         std::tr1::regex regex(replaceCharacterEntityReferences(match.format(replaceVariables(pattern, variables))));
         std::tr1::regex_search(inputString, secondMatch, regex);
     }
 
-    const std::tr1::smatch& matchToUse = secondMatch.empty() ? match : secondMatch;
+    const std::tr1::smatch& matchToUse = (!input.empty() && !pattern.empty()) ? secondMatch : match;
     return replaceCharacterEntityReferences(matchToUse.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, parameterName), variables)));
 }
 
