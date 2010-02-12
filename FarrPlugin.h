@@ -36,6 +36,7 @@ private:
 	Searches _searches;
 
     bool processCommand(const std::string& searchString);
+    void sendRequest(const std::string& searchUrl);
 
     void listHelpItems();
     void listAboutItems();

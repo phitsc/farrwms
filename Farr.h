@@ -45,6 +45,7 @@ namespace farr
     HWND getFarrMainWindow();
     std::string getPluginAlias();
     std::string getReadMeFileName();
+    std::string resolveFile(const std::string& path);
 
     class TemporaryStatusText
     {
