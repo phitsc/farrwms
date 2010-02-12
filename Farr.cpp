@@ -143,4 +143,15 @@ std::string getReadMeFileName()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+std::string resolveFile(const std::string& path)
+{
+    const int BufferLength = MAX_PATH;
+    char buffer[BufferLength] = { 0 };
+    callbackfp_get_strval(hostptr, std::string("resolvefile:" + path).c_str(), (char*)buffer, BufferLength);
+
+    return std::string(buffer);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 }

@@ -135,9 +135,7 @@ void FarrPlugin::search(const char* rawSearchString)
 
                         _logFile.writeLine("Search URL: '" + searchUrl + "'");
 
-                        _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
-                        _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
-                        _xmlHttpRequest->send();
+                        sendRequest(searchUrl);
 
                         return; // searching continues
                     }
@@ -161,9 +159,7 @@ void FarrPlugin::search(const char* rawSearchString)
 
                         _logFile.writeLine("Search URL: '" + searchUrl + "'");
 
-                        _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
-                        _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
-                        _xmlHttpRequest->send();
+                        sendRequest(searchUrl);
 
                         return; // searching continues
                     }
@@ -520,6 +516,42 @@ bool FarrPlugin::processCommand(const std::string& searchString)
     }
 
     return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void FarrPlugin::sendRequest(const std::string& searchUrl)
+{
+    if(PathIsURL(searchUrl.c_str()))
+    {
+        _xmlHttpRequest->open("GET", searchUrl.c_str(), VARIANT_TRUE);
+        _xmlHttpRequest->onreadystatechange = _xmlHttpEventSink;
+        _xmlHttpRequest->send();
+    }
+    else
+    {
+        const std::string filePath = farr::resolveFile(searchUrl);
+        std::ifstream file(filePath.c_str());
+        if(file.is_open())
+        {
+            std::stringstream text;
+
+            std::string line;
+            while(std::getline(file, line))
+            {
+                text << line << std::endl;
+            }
+
+            onHttpRequestResponse(text.str());
+        }
+        else
+        {
+            _isSearching = farr::signalSearchStateChanged(false, getItemCount());
+
+            const std::string errorText = "FarrWebMetaSearch Error!\n'" + filePath + "'\n not found.";
+            farr::displayAlertMessage(errorText);
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
