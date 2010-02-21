@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FarrItem.h"
-#include "Search.h"
+#include "Searches.h"
 #include "msxml.h"
 #include "XmlHttpEventSink.h"
 #include "XmlHttpRequestEvents.h"
@@ -11,6 +11,13 @@
 #include <map>
 #include <regex>
 #include <windows.h>
+
+///////////////////////////////////////////////////////////////////////////////
+
+namespace config
+{
+    class Search;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -45,12 +52,11 @@ private:
     void listSearches(const std::string& filter);
     void listSubsearches(const std::string& searchName, const std::string& filter);
     void listCachedItems(const std::string& filter);
-    void addSearchToResults(const Search& search, const std::string& filter);
-    void addSubsearchToResults(const Search& search, const Search::Subsearch& subsearch, const std::string& filter);
+    void addSearchToResults(const config::Search& search, const std::string& filter);
+    void addSubsearchToResults(const config::Search& search, const config::Subsearch& subsearch, const std::string& filter);
     void addItemToResults(const FarrItem& farrItem, const std::string& filter);
 
-    const Search* _currentSearch;
-    std::string   _currentSubsearchName;
+    const config::Subsearch* _currentSearch;
     std::string   _currentSearchTerm;
     bool _isSearching;
 

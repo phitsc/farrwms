@@ -191,7 +191,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Search.cpp"
+				RelativePath=".\Searches.cpp"
 				>
 			</File>
 			<File
@@ -253,7 +253,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Search.h"
+				RelativePath=".\Searches.h"
 				>
 			</File>
 			<File
@@ -276,6 +276,42 @@
 			>
 			<File
 				RelativePath=".\FarrWebMetaSearch.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="config"
+			>
+			<File
+				RelativePath=".\config\Button.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\Item.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\Menu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\Parameter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\ParameterNames.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\Regex.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\Result.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\Search.h"
 				>
 			</File>
 		</Filter>
