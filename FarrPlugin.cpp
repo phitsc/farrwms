@@ -441,13 +441,13 @@ void FarrPlugin::listCachedItems(const std::string& filter)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FarrPlugin::addSubsearchToResults(const config::Search& search, const config::Subsearch& subsearch, const std::string& filter)
+void FarrPlugin::addSubsearchToResults(const config::Search& search, const config::SubsearchPtr& subsearch, const std::string& filter)
 {
-    const bool isHidden = (subsearch.getParameterValue(config::param::IsHidden) == "true");
-    if(!isHidden && (filter.empty() || util::String::startsWithNoCase(subsearch.getName(), filter) || util::String::startsWithNoCase(subsearch.getAbbreviation(), filter)))
+    const bool isHidden = (subsearch->getParameterValue(config::param::IsHidden) == "true");
+    if(!isHidden && (filter.empty() || util::String::startsWithNoCase(subsearch->getName(), filter) || util::String::startsWithNoCase(subsearch->getAbbreviation(), filter)))
     {
-        const std::string caption = search.getName() + " +" + subsearch.getName() + (!subsearch.getAbbreviation().empty() ? " (" + subsearch.getAbbreviation() + ")" : "");
-        _farrItems.push_back(FarrItem(caption, subsearch.getParameterValue(config::param::Description), _farrAlias + search.getName() + " +" + subsearch.getName(), subsearch.getParameterValue(config::param::Icon), FarrItem::Alias));
+        const std::string caption = search.getName() + " +" + subsearch->getName() + (!subsearch->getAbbreviation().empty() ? " (" + subsearch->getAbbreviation() + ")" : "");
+        _farrItems.push_back(FarrItem(caption, subsearch->getParameterValue(config::param::Description), _farrAlias + search.getName() + " +" + subsearch->getName(), subsearch->getParameterValue(config::param::Icon), FarrItem::Alias));
     }
 }
 

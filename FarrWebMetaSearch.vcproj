@@ -287,6 +287,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\config\Item.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\config\Item.h"
 				>
 			</File>
