@@ -16,6 +16,11 @@ namespace config
 class Subsearch : public Item
 {
 public:
+    Subsearch(const std::string& name, const std::string& abbreviation) :
+      _name(name),
+      _abbreviation(abbreviation)
+    {}
+
     const std::string& getName() const
     {
         return _name;
@@ -29,6 +34,11 @@ public:
     bool hasName(const std::string& name) const
     {
         return (getName() == name);
+    }
+
+    bool operator<(const Subsearch& other) const
+    {
+        return (_name < other._name);
     }
 
 private:
@@ -74,6 +84,9 @@ public:
     {
         return _subsearches.end();
     }
+
+private:
+    static std::string extractName(const std::string& searchFile);
 
 private:
     Subsearches _subsearches;

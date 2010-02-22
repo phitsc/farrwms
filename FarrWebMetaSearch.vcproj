@@ -291,6 +291,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\config\Keywords.h"
+				>
+			</File>
+			<File
 				RelativePath=".\config\Menu.h"
 				>
 			</File>
@@ -308,6 +312,10 @@
 			</File>
 			<File
 				RelativePath=".\config\Result.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config\Search.cpp"
 				>
 			</File>
 			<File
