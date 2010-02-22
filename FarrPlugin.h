@@ -53,7 +53,7 @@ private:
     void listSubsearches(const std::string& searchName, const std::string& filter);
     void listCachedItems(const std::string& filter);
     void addSearchToResults(const config::Search& search, const std::string& filter);
-    void addSubsearchToResults(const config::Search& search, const config::Subsearch& subsearch, const std::string& filter);
+    void addSubsearchToResults(const config::Search& search, const config::SubsearchPtr& subsearch, const std::string& filter);
     void addItemToResults(const FarrItem& farrItem, const std::string& filter);
 
     const config::Subsearch* _currentSearch;

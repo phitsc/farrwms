@@ -41,7 +41,11 @@ public:
         return (_name < other._name);
     }
 
+    bool processConfigLine(const std::string& line);
+
 private:
+    bool processParameterConfigLine(const std::string& line);
+
     std::string _name;
     std::string _abbreviation;
 
@@ -50,9 +54,11 @@ private:
     Items _items;
 };
 
+typedef std::tr1::shared_ptr<Subsearch> SubsearchPtr;
+
 class Search : public Subsearch
 {
-    typedef std::set<Subsearch> Subsearches;
+    typedef std::set<SubsearchPtr> Subsearches;
 public:
     Search(const std::string& searchFile);
 
@@ -66,7 +72,8 @@ public:
     {
         using namespace std::tr1::placeholders;
         const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::hasName, _1, name));
-        return *it;
+        SubsearchPtr subsearch = *it;
+        return *subsearch;
     }
 
     bool operator<(const Search& search) const
