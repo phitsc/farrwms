@@ -12,18 +12,42 @@ class Item
 {
     typedef std::set<Parameter> Parameters;
 public:
+    Item(const std::string& name) :
+        _name(name)
+    {
+    }
+
+    const std::string& getName() const
+    {
+        return _name;
+    }
+
     const std::string& getParameterValue(const std::string& name) const
     {
         const Parameters::const_iterator it = _parameters.find(name);
-        const Parameter& parameter = *it;
-        return parameter.getValue();
+        if(it != _parameters.end())
+        {
+            const Parameter& parameter = *it;
+            return parameter.getValue();
+        }
+        else
+        {
+            static std::string empty;
+            return empty;
+        }
     }
 
-protected:
-    void insertParameter(const std::string& name, const std::string& value);
+    bool operator==(const Item& item) const
+    {
+        return (getName() == item.getName());
+    }
+
+    void addParameter(const std::string& name, const std::string& value);
 
 private:
-    Parameters _parameters;
+    std::string _name;
+
+    Parameters  _parameters;
 };
 
 }

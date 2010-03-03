@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <string>
 
 namespace config
 {
@@ -13,6 +14,10 @@ namespace config
             const char* Icon        = "icon";
             const char* Description = "description";
             const char* IsHidden    = "isHidden";
+            const char* Expression  = "expression";
+            const char* Caption     = "caption";
+            const char* Group       = "group";
+            const char* Path        = "path";
         }
     }
 
@@ -46,6 +51,10 @@ namespace config
             _parameterNames.insert(param::Icon);
             _parameterNames.insert(param::Description);
             _parameterNames.insert(param::IsHidden);
+            _parameterNames.insert(param::Expression);
+            _parameterNames.insert(param::Caption);
+            _parameterNames.insert(param::Group);
+            _parameterNames.insert(param::Path);
         }
 
         ParameterNameCollection _parameterNames;

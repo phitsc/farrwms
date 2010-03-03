@@ -6,5 +6,6 @@ namespace config
     {
         const char* Subsearch   = "subSearch";
         const char* Result      = "result";
+        const char* End         = "end";
     }
 }

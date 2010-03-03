@@ -411,7 +411,7 @@ void FarrPlugin::addSearchToResults(const config::Search& search, const std::str
 
     if(filter.empty() || util::String::containsSubstringNoCase(searchName, filter))
     {
-        _farrItems.push_back(FarrItem(searchName, search.getParameterValue(config::param::Description), _farrAlias + search.getName(), search.getParameterValue(config::param::Icon), FarrItem::Alias));
+        _farrItems.push_back(FarrItem(searchName, search.getParameterValue(config::param::Description), _farrAlias + search.getName(), _searchesPath + search.getParameterValue(config::param::Icon), FarrItem::Alias));
     }
 }
 
