@@ -2,7 +2,9 @@
 #include "Keywords.h"
 #include "ParameterNames.h"
 #include "ItemNames.h"
+#include "ParseError.h"
 
+#include <sstream>
 #include <fstream>
 #include <regex>
 #include <algorithm>
@@ -24,8 +26,10 @@ Search::Search(const std::string& searchFile) :
         Item*      currentItem = 0;
 
         std::string line;
+        unsigned long lineNumber = 0;
         while(std::getline(file, line))
         {
+            ++lineNumber;
             boost::trim(line);
             if(line.empty() || boost::starts_with(line, ";"))
             {
@@ -43,25 +47,21 @@ Search::Search(const std::string& searchFile) :
                     currentSubsearch = subsearch;
                     continue;
                 }
-                else
-                {
-                    // report error
-                    break;
-                }
+
+
+                throwError(searchFile, lineNumber, "invalid subsearch definition");
             }
 
             if(currentSubsearch == 0)
             {
-                // report error
-                break;
+                throwError(searchFile, lineNumber, "missing subsearch definition");
             }
 
             if(boost::starts_with(line, keyword::End))
             {
                 if(!processEnd(currentSubsearch, currentItem))
                 {
-                    // report error
-                    break;
+                    throwError(searchFile, lineNumber, "superfluous end");
                 }
             }
 
@@ -107,6 +107,13 @@ std::string Search::extractName(const std::string& searchFile)
     {
         return searchFile.substr(0, posPoint);
     }
+}
+
+void Search::throwError(const std::string& fileName, unsigned long lineNumber, const std::string& message)
+{
+    std::stringstream stream;
+    stream << fileName << "(" << lineNumber << ") : " << message;
+    throw ParseError(stream.str());
 }
 
 bool Subsearch::processConfigLine(const std::string& line, Item*& currentItem)
@@ -165,7 +172,8 @@ bool Subsearch::processItemConfigLine(const std::string& line, Item*& currentIte
 Item* Subsearch::addItem(const std::string& itemName)
 {
     ItemPtr item(new Item(itemName));
-    _items.push_back(item);
+    Items& items = _itemsCollection[itemName];
+    items.push_back(item);
     return item.get();
 }
 

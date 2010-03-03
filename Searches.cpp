@@ -1,6 +1,7 @@
 #include "Searches.h"
 #include "FileList.h"
 #include "Util.h"
+#include "config/ParseError.h"
 
 #include <algorithm>
 #include <functional> 
@@ -21,8 +22,14 @@ Searches::Searches(const std::string& searchesDirectory)
 
 void Searches::addSearch(const std::string& searchFile)
 {
-    config::Search search(searchFile);
-    _searches.insert(search);
+    try
+    {
+        config::Search search(searchFile);
+        _searches.insert(search);
+    }
+    catch(config::ParseError& /*error*/)
+    {
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -3,12 +3,13 @@
 #include "Parameter.h"
 #include "Item.h"
 
+#include <algorithm>
+#include <functional>
+#include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <functional>
 
 namespace config
 {
@@ -17,8 +18,8 @@ class Subsearch : public Item
 {
 public:
     Subsearch(const std::string& name, const std::string& abbreviation) :
-      Item(name),
-      _abbreviation(abbreviation)
+        Item(name),
+        _abbreviation(abbreviation)
     {}
 
     const std::string& getAbbreviation() const
@@ -48,7 +49,8 @@ private:
 
     typedef std::tr1::shared_ptr<Item> ItemPtr;
     typedef std::vector<ItemPtr> Items;
-    Items _items;
+    typedef std::map<std::string, Items> ItemsCollection;
+    ItemsCollection _itemsCollection;
 };
 
 typedef std::tr1::shared_ptr<Subsearch> SubsearchPtr;
@@ -92,6 +94,7 @@ public:
 private:
     static bool processEnd(Subsearch*& currentSubsearch, Item*& currentItem);
     static std::string extractName(const std::string& searchFile);
+    static void throwError(const std::string& fileName, unsigned long lineNumber, const std::string& message);
 
 private:
     Subsearches _subsearches;
