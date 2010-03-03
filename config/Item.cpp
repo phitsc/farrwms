@@ -4,7 +4,7 @@
 
 namespace config
 {
-    void Item::insertParameter(const std::string& name, const std::string& value)
+    void Item::addParameter(const std::string& name, const std::string& value)
     {
         _parameters.insert(Parameter(name, boost::trim_copy(value)));
     }

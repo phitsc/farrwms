@@ -1,6 +1,7 @@
 #include "Search.h"
 #include "Keywords.h"
 #include "ParameterNames.h"
+#include "ItemNames.h"
 
 #include <fstream>
 #include <regex>
@@ -20,6 +21,7 @@ Search::Search(const std::string& searchFile) :
     if(file.is_open())
     {
         Subsearch* currentSubsearch = this;
+        Item*      currentItem = 0;
 
         std::string line;
         while(std::getline(file, line))
@@ -48,12 +50,45 @@ Search::Search(const std::string& searchFile) :
                 }
             }
 
-            if(!currentSubsearch->processConfigLine(line))
+            if(currentSubsearch == 0)
+            {
+                // report error
+                break;
+            }
+
+            if(boost::starts_with(line, keyword::End))
+            {
+                if(!processEnd(currentSubsearch, currentItem))
+                {
+                    // report error
+                    break;
+                }
+            }
+
+            if(!currentSubsearch->processConfigLine(line, currentItem))
             {
                 // report error
                 break;
             }
         }
+    }
+}
+
+bool Search::processEnd(Subsearch*& currentSubsearch, Item*& currentItem)
+{
+    if(currentItem != 0)
+    {
+        currentItem = 0;
+        return true;
+    }
+    else if(currentSubsearch != 0)
+    {
+        currentSubsearch = 0;
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -74,32 +109,64 @@ std::string Search::extractName(const std::string& searchFile)
     }
 }
 
-bool Subsearch::processConfigLine(const std::string& line)
+bool Subsearch::processConfigLine(const std::string& line, Item*& currentItem)
 {
-    if(processParameterConfigLine(line))
+    if(processParameterConfigLine(line, currentItem))
     {
         return true;
     }
-
-
+    else if(processItemConfigLine(line, currentItem))
+    {
+        return true;
+    }
+    
+    return false;
 }
 
-bool Subsearch::processParameterConfigLine(const std::string& line)
+bool Subsearch::processParameterConfigLine(const std::string& line, Item* currentItem)
 {
     const ParameterNames& parameterNames = ParameterNames::get();
-    ParameterNames::const_iterator it = std::find_if(parameterNames.begin(), parameterNames.end(), std::tr1::bind(&boost::starts_with<std::string, std::string>, line, _1));
+    const ParameterNames::const_iterator it = std::find_if(parameterNames.begin(), parameterNames.end(), std::tr1::bind(&boost::starts_with<std::string, std::string>, line, _1));
     if(it != parameterNames.end())
     {
         const std::string& parameterName = *it;
         
-        insertParameter(parameterName, line.substr(parameterName.length()));
+        if(currentItem == 0)
+        {
+            addParameter(parameterName, line.substr(parameterName.length()));
+        }
+        else
+        {
+            currentItem->addParameter(parameterName, line.substr(parameterName.length()));
+        }
 
         return true;
     }
-    else
+
+    return false;
+}
+
+bool Subsearch::processItemConfigLine(const std::string& line, Item*& currentItem)
+{
+    const ItemNames& itemNames = ItemNames::get();
+    const ItemNames::const_iterator it = std::find_if(itemNames.begin(), itemNames.end(), std::tr1::bind(&boost::starts_with<std::string, std::string>, line, _1));
+    if(it != itemNames.end())
     {
-        return false;
+        const std::string& itemName = *it;
+
+        currentItem = addItem(itemName);
+
+        return true;
     }
+
+    return false;
+}
+
+Item* Subsearch::addItem(const std::string& itemName)
+{
+    ItemPtr item(new Item(itemName));
+    _items.push_back(item);
+    return item.get();
 }
 
 }

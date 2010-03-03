@@ -17,14 +17,9 @@ class Subsearch : public Item
 {
 public:
     Subsearch(const std::string& name, const std::string& abbreviation) :
-      _name(name),
+      Item(name),
       _abbreviation(abbreviation)
     {}
-
-    const std::string& getName() const
-    {
-        return _name;
-    }
 
     const std::string& getAbbreviation() const
     {
@@ -38,15 +33,17 @@ public:
 
     bool operator<(const Subsearch& other) const
     {
-        return (_name < other._name);
+        return (getName() < other.getName());
     }
 
-    bool processConfigLine(const std::string& line);
+    bool processConfigLine(const std::string& line, Item*& currentItem);
 
 private:
-    bool processParameterConfigLine(const std::string& line);
+    bool processParameterConfigLine(const std::string& line, Item* currentItem);
+    bool processItemConfigLine(const std::string& line, Item*& currentItem);
 
-    std::string _name;
+    Item* addItem(const std::string& itemName);
+
     std::string _abbreviation;
 
     typedef std::tr1::shared_ptr<Item> ItemPtr;
@@ -93,6 +90,7 @@ public:
     }
 
 private:
+    static bool processEnd(Subsearch*& currentSubsearch, Item*& currentItem);
     static std::string extractName(const std::string& searchFile);
 
 private:
