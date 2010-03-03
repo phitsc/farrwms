@@ -311,6 +311,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\config\ParseError.h"
+				>
+			</File>
+			<File
 				RelativePath=".\config\Regex.h"
 				>
 			</File>
