@@ -131,11 +131,13 @@ void FarrPlugin::search(const char* rawSearchString)
                     {
                         _farrItemCache.clear();
 
-                        const std::string searchUrl = util::String::escapeUrl(_currentSearch->getParameter(_currentSubsearchName, "searchUrl"));
+                        const std::string& searchUrl = _currentSearch->getParameter(_currentSubsearchName, "searchUrl");
 
-                        _logFile.writeLine("Search URL: '" + searchUrl + "'");
+                        const std::string escapedSearchUrl = PathIsURL(searchUrl.c_str()) ? util::String::escapeUrl(searchUrl) : farr::resolveFile(searchUrl);
 
-                        sendRequest(searchUrl);
+                        _logFile.writeLine("Search URL: '" + escapedSearchUrl + "'");
+
+                        sendRequest(escapedSearchUrl);
 
                         return; // searching continues
                     }
@@ -239,7 +241,7 @@ void FarrPlugin::onHttpRequestResponse(const std::string& responseText)
         const std::string group = getValue("farrGroup", match, variables);
         const std::string url = getValue("farrPath", match, variables);
 
-        FarrItem farrItem(caption, group, removeHttp(url), _currentSearch->getParameter(_currentSubsearchName, "farrIconPath"), FarrItem::Url);
+        FarrItem farrItem(caption, group, removeHttp(fixUrl(url)), _currentSearch->getParameter(_currentSubsearchName, "farrIconPath"), FarrItem::Url);
 
         for(unsigned long index = 1; index <= Searches::MaxContextMenuItemCount; ++index)
         {
@@ -651,6 +653,18 @@ std::string FarrPlugin::replaceVariables(const std::string& text, const Variable
 {
     std::string temp(text);
     std::for_each(variables.begin(), variables.end(), std::tr1::bind(&FarrPlugin::replaceVariable, std::tr1::ref(temp), _1));
+    return temp;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+std::string FarrPlugin::fixUrl(const std::string& url)
+{
+    std::string temp(url);
+
+    // remove <wbr><a class="wbr"></a> in MSDN urls
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("<wbr><a class=\"wbr\"></a>"), std::string(""));
+
     return temp;
 }
 
