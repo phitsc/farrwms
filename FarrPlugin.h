@@ -85,6 +85,7 @@ private:
     static std::string removeHttp(const std::string& url);
     static void        replaceVariable(std::string& text, const Variables::value_type& variableAndValue);
     static std::string replaceVariables(const std::string& text, const Variables& variables);
+    static std::string fixUrl(const std::string& url);
 	//static std::string fixLink(const std::string& link, const std::string& searchUrl);
 };
 
