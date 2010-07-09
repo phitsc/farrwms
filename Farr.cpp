@@ -1,6 +1,7 @@
 #include "Farr.h"
 #include "JrPlugin_GenericShell.h"
 #include "JrPlugin_MyPlugin.h"
+#include <Shlwapi.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -143,13 +144,35 @@ std::string getReadMeFileName()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+std::string getFarrDirectory()
+{
+    char modulePath[MAX_PATH] = { 0 };
+    GetModuleFileName(NULL, modulePath, MAX_PATH);
+    PathRemoveFileSpec(modulePath);
+
+    return modulePath;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 std::string resolveFile(const std::string& path)
 {
-    const int BufferLength = MAX_PATH;
-    char buffer[BufferLength] = { 0 };
-    callbackfp_get_strval(hostptr, std::string("resolvefile:" + path).c_str(), (char*)buffer, BufferLength);
+    std::string tempPath = (path.find("..\\") == 0) ? (getFarrDirectory() + "\\" + path) : path;
 
-    return std::string(buffer);
+    const int BufferLength = MAX_PATH;
+    
+    char buffer[BufferLength] = { 0 };
+    callbackfp_get_strval(hostptr, std::string("resolvefile:" + tempPath).c_str(), (char*)buffer, BufferLength);
+
+    char buffer2[BufferLength] = { 0 };
+    if(PathCanonicalize(buffer2, buffer))
+    {
+        return std::string(buffer2);
+    }
+    else
+    {
+        return std::string(buffer);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
