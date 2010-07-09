@@ -43,7 +43,7 @@ DAMAGE.
 <!--}}}-->
 
 <!--PRE-HEAD-END-->
-<title> FarrWebMetaSearch - 1.5.1 </title>
+<title> FarrWebMetaSearch - 1.6.0 </title>
 <style id="styleArea" type="text/css">
 #saveTest {display:none;}
 #messageArea {display:none;}
@@ -552,7 +552,7 @@ Type {{{ wms ? }}} to open this help file in an external browser.
 [[Credits]]
 [[Disclaimer]]</pre>
 </div>
-<div title="Search config files" modifier="phitsc" created="201001092100" modified="201002052157" changecount="18">
+<div title="Search config files" modifier="PTs" created="201001092100" modified="201007090740" changecount="24">
 <pre>New searches can be added to the FarrWebMetaSearch plugin by adding search configuration files. Search configuration files have the {{{.conf}}} file extension and have to be in the plugin's {{{searches}}} subdirectory.
 
 !Basics
@@ -578,6 +578,9 @@ A basic search configuration file should have the following parameters defined:
 | contextIcon1..9 | Icon filename for context menu item. Icon must be in searches subdirectory. Make sure to choose a unique name. |
 | contextHint1..9 | Hint displayed in status bar when context menu item is selected |
 | contextPath1..9 | Launch string for context menu item |
+
+!!searchUrl
+This can be either a local file or a web page. For web pages, start with {{{http://}}}, for local files, either use an absolute path (e.g. {{{c:\temp\somefile.txt}}}), a relative path (e.g. {{{..\..\temp\somefile.txt}}}) which will be resolved relative to where FindAndRunRobot.exe is, or use any of the FARR virtual folder variables (.e.g {{{%MYDOCUMENTS%\somefile.txt}}}).
 
 !!resultPattern
 The {{{resultPattern}}} defines a regular expression that is applied to the search web page in order to grab the results. The regular expression grammar used is ECMAScript (aka JavaScript).
@@ -612,8 +615,8 @@ FarrWebMetaSearch can be used to search feeds and static pages. The behaviour is
 
 A search defined as a feed will start searching as soon as one enters a space after the search name. Once the results are displayed, the search terms typed will narrow down the results to match the entered search terms. (note that starting to type search terms before the result items are displayed will currently stop the search).</pre>
 </div>
-<div title="SiteSubtitle" modifier="phitsc" created="201001082229" modified="201002112206" changecount="10">
-<pre>1.5.1</pre>
+<div title="SiteSubtitle" modifier="PTs" created="201001082229" modified="201007090733" changecount="11">
+<pre>1.6.0</pre>
 </div>
 <div title="SiteTitle" modifier="phitsc" created="201001082227" changecount="1">
 <pre>FarrWebMetaSearch</pre>
@@ -628,8 +631,14 @@ A search defined as a feed will start searching as soon as one enters a space af
 * --Make additional links available via context menu entries--
 * Add many more searches :)</pre>
 </div>
-<div title="Version history" modifier="phitsc" created="201001082239" modified="201002112210" changecount="54">
-<pre>''1.5.1 - 11. February 2010''
+<div title="Version history" modifier="PTs" created="201001082239" modified="201007090749" changecount="58">
+<pre>''1.6.0 - 9. July 2010''
+* can now search local files (see [[Search config files]])
+* New / updated searches:
+** google (by Alien282)
+** fixed MSDN search
+
+''1.5.1 - 11. February 2010''
 * implemented status bar icons
 * implemented two stage regex
 * replacing many more character entity references. now supports all the French characters as well.
