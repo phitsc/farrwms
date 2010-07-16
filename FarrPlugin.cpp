@@ -625,6 +625,7 @@ std::string FarrPlugin::replaceCharacterEntityReferences(const std::string& text
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&nbsp;"), std::string(" "));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&nbsp;"), std::string(" "));
     temp = std::tr1::regex_replace(temp, std::tr1::regex("&deg;"), std::string("°"));
+    temp = std::tr1::regex_replace(temp, std::tr1::regex("&euro;"), std::string("€"));
 
     return temp;
 }
