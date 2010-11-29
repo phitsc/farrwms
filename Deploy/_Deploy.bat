@@ -1,2 +1,0 @@
-C:\Users\Philipp\Projekte\UpdateVersion\Deploy\UpdateVersion.exe -s C:\Users\Philipp\Projekte\FarrWebMetaSearch\Deploy\FarrWebMetaSearch.dll -t C:\Users\Philipp\Projekte\FarrWebMetaSearch\Deploy\FarrWebMetaSearch.dcupdate -t C:\Users\Philipp\Projekte\FarrWebMetaSearch\Deploy\versioninfo.xml
-"C:\Program Files\7-Zip\7z.exe" a FarrWebMetaSearch.zip C:\Users\Philipp\Projekte\FarrWebMetaSearch\Deploy\*.* -r -xr!.svn -x!versioninfo.xml -x!_Deploy.bat -x!*.zip -tzip
