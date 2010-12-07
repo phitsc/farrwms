@@ -8,35 +8,29 @@ Compression=lzma2
 SolidCompression=yes
 
 [Files]
-Source: "..\Deploy\FarrWebMetaSearch.dll"; DestDir: "{app}"; BeforeInstall: UnloadFarrPlugins
+Source: "..\Deploy\CloseApp2.dll"; DestDir: "{tmp}"; Flags: onlyifdoesntexist
+Source: "..\Deploy\FarrWebMetaSearch.dll"; DestDir: "{app}";
 Source: "..\Deploy\FarrWebMetaSearch.ico"; DestDir: "{app}"
 Source: "..\Deploy\FarrWebMetaSearch.dcupdate"; DestDir: "{app}"
 Source: "..\Deploy\icons\*.ico"; DestDir: "{app}\icons"
 Source: "..\Deploy\searches\*.conf"; DestDir: "{app}\searches"
 Source: "..\Deploy\searches\*.ico"; DestDir: "{app}\searches"
 Source: "..\Deploy\searches\*.html"; DestDir: "{app}\searches"
-Source: "..\Deploy\FarrWebMetaSearch.html"; DestDir: "{app}"; Flags: isreadme; AfterInstall: ReloadFarrPlugins 
+Source: "..\Deploy\FarrWebMetaSearch.html"; DestDir: "{app}"; Flags: isreadme
 
 [Code]
-const 
-  WM_USER = 1024;
+// importing DLL functions from closeapp2.dll
+procedure SendMsgUnloadPlugins_OnInstall(farrApplicationName: String);
+external 'SendMsgUnloadPlugins@files:CloseApp2.dll cdecl setuponly';
 
-var
-  WindowHandle: HWND;
+procedure SendMsgLoadPlugins_OnInstall(farrApplicationName: String);
+external 'SendMsgLoadPlugins@files:CloseApp2.dll cdecl setuponly';
 
-procedure UnloadFarrPlugins();
+//
+procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  WindowHandle := FindWindowByWindowName('Find and Run Robot');
-  if WindowHandle <> 0 then begin
-    // tell FARR to unload plugins
-    SendMessage(WindowHandle, WM_USER, 97, 98);
-  end;
-end;
-
-procedure ReloadFarrPlugins();
-begin
-  if WindowHandle <> 0 then begin
-    // tell FARR to reload plugins
-    SendMessage(WindowHandle, WM_USER, 98, 98);
-  end;
+    case CurStep of
+        ssInstall: SendMsgUnloadPlugins_OnInstall('FindAndRunRobot.exe');
+        ssPostInstall: SendMsgLoadPlugins_OnInstall('FindAndRunRobot.exe');
+    end;
 end;
