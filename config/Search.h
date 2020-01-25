@@ -47,13 +47,13 @@ private:
 
     std::string _abbreviation;
 
-    typedef std::tr1::shared_ptr<Item> ItemPtr;
+    typedef std::shared_ptr<Item> ItemPtr;
     typedef std::vector<ItemPtr> Items;
     typedef std::map<std::string, Items> ItemsCollection;
     ItemsCollection _itemsCollection;
 };
 
-typedef std::tr1::shared_ptr<Subsearch> SubsearchPtr;
+typedef std::shared_ptr<Subsearch> SubsearchPtr;
 
 class Search : public Subsearch
 {
@@ -63,14 +63,14 @@ public:
 
     bool hasSubsearch(const std::string& name) const
     {
-        using namespace std::tr1::placeholders;
-        return (std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::hasName, _1, name)) != _subsearches.end());
+        using namespace std::placeholders;
+        return (std::find_if(_subsearches.begin(), _subsearches.end(), std::bind(&Subsearch::hasName, _1, name)) != _subsearches.end());
     }
 
     const Subsearch& getSubsearch(const std::string& name) const
     {
-        using namespace std::tr1::placeholders;
-        const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::tr1::bind(&Subsearch::hasName, _1, name));
+        using namespace std::placeholders;
+        const Subsearches::const_iterator it = std::find_if(_subsearches.begin(), _subsearches.end(), std::bind(&Subsearch::hasName, _1, name));
         SubsearchPtr subsearch = *it;
         return *subsearch;
     }

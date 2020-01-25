@@ -9,7 +9,7 @@
 #include <regex>
 #include <algorithm>
 #include <functional>
-using namespace std::tr1::placeholders;
+using namespace std::placeholders;
 
 #include <boost/algorithm/string.hpp>
 
@@ -39,8 +39,8 @@ Search::Search(const std::string& searchFile) :
 
             if(boost::starts_with(line, keyword::Subsearch))
             {
-                std::tr1::smatch matches;
-                if(std::tr1::regex_match(line, matches, std::tr1::regex(keyword::Subsearch + std::string("\\s+(\\w+)\\s*(\\(\\w+\\))?"))))
+                std::smatch matches;
+                if(std::regex_match(line, matches, std::regex(keyword::Subsearch + std::string("\\s+(\\w+)\\s*(\\(\\w+\\))?"))))
                 {
                     Subsearch* subsearch = new Subsearch(matches.str(1), matches.str(2));
                     _subsearches.insert(SubsearchPtr(subsearch));
@@ -133,7 +133,7 @@ bool Subsearch::processConfigLine(const std::string& line, Item*& currentItem)
 bool Subsearch::processParameterConfigLine(const std::string& line, Item* currentItem)
 {
     const ParameterNames& parameterNames = ParameterNames::get();
-    const ParameterNames::const_iterator it = std::find_if(parameterNames.begin(), parameterNames.end(), std::tr1::bind(&boost::starts_with<std::string, std::string>, line, _1));
+    const ParameterNames::const_iterator it = std::find_if(parameterNames.begin(), parameterNames.end(), std::bind(&boost::starts_with<std::string, std::string>, line, _1));
     if(it != parameterNames.end())
     {
         const std::string& parameterName = *it;
@@ -156,7 +156,7 @@ bool Subsearch::processParameterConfigLine(const std::string& line, Item* curren
 bool Subsearch::processItemConfigLine(const std::string& line, Item*& currentItem)
 {
     const ItemNames& itemNames = ItemNames::get();
-    const ItemNames::const_iterator it = std::find_if(itemNames.begin(), itemNames.end(), std::tr1::bind(&boost::starts_with<std::string, std::string>, line, _1));
+    const ItemNames::const_iterator it = std::find_if(itemNames.begin(), itemNames.end(), std::bind(&boost::starts_with<std::string, std::string>, line, _1));
     if(it != itemNames.end())
     {
         const std::string& itemName = *it;

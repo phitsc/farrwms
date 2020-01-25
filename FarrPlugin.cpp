@@ -13,7 +13,7 @@
 
 #include <shlwapi.h>
 
-using namespace std::tr1::placeholders; 
+using namespace std::placeholders; 
 
 namespace
 {
@@ -68,7 +68,7 @@ const FarrItem& FarrPlugin::getItem(const FarrItems::size_type& index) const
 
 void FarrPlugin::showSearchInfo(const std::string& searchName)
 {
-    Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&config::Search::hasName, _1, searchName));
+    Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::bind(&config::Search::hasName, _1, searchName));
     if(it != _searches.end())
     {
         const config::Search& search = *it;
@@ -116,7 +116,7 @@ void FarrPlugin::search(const char* rawSearchString)
 
         if(!searchName.empty())
 	    {
-            const Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&config::Search::hasName, _1, searchName));
+            const Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::bind(&config::Search::hasName, _1, searchName));
 		    if(it != _searches.end())
 		    {
                 const config::Search& search = *it;
@@ -232,12 +232,12 @@ void FarrPlugin::onHttpRequestResponse(const std::string& /*responseText*/)
 
     //_logFile.writeLine("Result pattern: '" + resultPattern + "'");
 
-    //const std::tr1::regex expression(resultPattern);
-    //std::tr1::sregex_iterator it(responseText.begin(), responseText.end(), expression);
-    //std::tr1::sregex_iterator end;
+    //const std::regex expression(resultPattern);
+    //std::sregex_iterator it(responseText.begin(), responseText.end(), expression);
+    //std::sregex_iterator end;
     //for( ; it != end; ++it)
     //{
-    //    const std::tr1::smatch match = *it;
+    //    const std::smatch match = *it;
     //    
     //    const std::string caption = getValue("farrCaption", match, variables);
     //    const std::string group = getValue("farrGroup", match, variables);
@@ -286,9 +286,9 @@ void FarrPlugin::onHttpRequestResponse(const std::string& /*responseText*/)
     //        break;
     //    }
 
-    //    const std::tr1::regex expression(statusCaptionPattern);
-    //    std::tr1::smatch match;
-    //    if(std::tr1::regex_search(responseText, match, expression))
+    //    const std::regex expression(statusCaptionPattern);
+    //    std::smatch match;
+    //    if(std::regex_search(responseText, match, expression))
     //    {
     //        const std::string statusCaption = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusCaption" + util::String::toString(index)), variables)));
     //        const std::string statusPath = replaceCharacterEntityReferences(match.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, "statusPath" + util::String::toString(index)), variables)));
@@ -319,19 +319,19 @@ void FarrPlugin::onHttpRequestResponse(const std::string& /*responseText*/)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-std::string FarrPlugin::getValue(const std::string& /*parameterName*/, const std::tr1::smatch& /*match*/, const Variables& /*variables*/)
+std::string FarrPlugin::getValue(const std::string& /*parameterName*/, const std::smatch& /*match*/, const Variables& /*variables*/)
 {
-    //std::tr1::smatch secondMatch;
+    //std::smatch secondMatch;
     //const std::string input = _currentSearch->getParameter(_currentSubsearchName, parameterName + "Input");
     //const std::string pattern = _currentSearch->getParameter(_currentSubsearchName, parameterName + "Pattern");
     //const std::string inputString = (input.empty() || pattern.empty()) ? "" : replaceCharacterEntityReferences(match.format(replaceVariables(input, variables)));
     //if(!input.empty() && !pattern.empty())
     //{
-    //    std::tr1::regex regex(replaceCharacterEntityReferences(match.format(replaceVariables(pattern, variables))));
-    //    std::tr1::regex_search(inputString, secondMatch, regex);
+    //    std::regex regex(replaceCharacterEntityReferences(match.format(replaceVariables(pattern, variables))));
+    //    std::regex_search(inputString, secondMatch, regex);
     //}
 
-    //const std::tr1::smatch& matchToUse = (!input.empty() && !pattern.empty()) ? secondMatch : match;
+    //const std::smatch& matchToUse = (!input.empty() && !pattern.empty()) ? secondMatch : match;
     //return replaceCharacterEntityReferences(matchToUse.format(replaceVariables(_currentSearch->getParameter(_currentSubsearchName, parameterName), variables)));
 
     return "";
@@ -399,7 +399,7 @@ void FarrPlugin::listCommandItems()
 
 void FarrPlugin::listSearches(const std::string& filter)
 {
-	std::for_each(_searches.begin(), _searches.end(), std::tr1::bind(&FarrPlugin::addSearchToResults, this, _1, filter));
+	std::for_each(_searches.begin(), _searches.end(), std::bind(&FarrPlugin::addSearchToResults, this, _1, filter));
     _farrItemCache = _farrItems;
 }
 
@@ -421,12 +421,12 @@ void FarrPlugin::listSubsearches(const std::string& searchName, const std::strin
 {
     if(!searchName.empty())
     {
-        Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::tr1::bind(&config::Search::hasName, _1, searchName));
+        Searches::const_iterator it = std::find_if(_searches.begin(), _searches.end(), std::bind(&config::Search::hasName, _1, searchName));
         if(it != _searches.end())
         {
             const config::Search& search = (*it);
 
-            std::for_each(search.subsearchesBegin(), search.subsearchesEnd(), std::tr1::bind(&FarrPlugin::addSubsearchToResults, this, search, _1, filter));
+            std::for_each(search.subsearchesBegin(), search.subsearchesEnd(), std::bind(&FarrPlugin::addSubsearchToResults, this, search, _1, filter));
             _farrItemCache = _farrItems;
         }
     }
@@ -436,7 +436,7 @@ void FarrPlugin::listSubsearches(const std::string& searchName, const std::strin
 
 void FarrPlugin::listCachedItems(const std::string& filter)
 {
-    std::for_each(_farrItemCache.begin(), _farrItemCache.end(), std::tr1::bind(&FarrPlugin::addItemToResults, this, _1, filter));
+    std::for_each(_farrItemCache.begin(), _farrItemCache.end(), std::bind(&FarrPlugin::addItemToResults, this, _1, filter));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -477,19 +477,19 @@ bool FarrPlugin::processCommand(const std::string& searchString)
 
             return true;
         }
-        else if(std::tr1::regex_match(searchString, std::tr1::regex("!about(?: )?")))
+        else if(std::regex_match(searchString, std::regex("!about(?: )?")))
         {
             listAboutItems();
 
             return true;
         }
-        else if(std::tr1::regex_match(searchString, std::tr1::regex("!showAllItems(?: )?")))
+        else if(std::regex_match(searchString, std::regex("!showAllItems(?: )?")))
         {
             farr::setShowAllMode();
             farr::clearMenuItems();
             listCachedItems("");
         }
-        else if(std::tr1::regex_match(searchString, std::tr1::regex("!enableLogging(?: )?")))
+        else if(std::regex_match(searchString, std::regex("!enableLogging(?: )?")))
         {
             if(_logFile.enable())
             {
@@ -504,7 +504,7 @@ bool FarrPlugin::processCommand(const std::string& searchString)
 
             farr::setNewSearch(_farrAlias);
         }
-        else if(std::tr1::regex_match(searchString, std::tr1::regex("!disableLogging(?: )?")))
+        else if(std::regex_match(searchString, std::regex("!disableLogging(?: )?")))
         {
             _logFile.disable();
 
@@ -619,16 +619,16 @@ std::string FarrPlugin::replaceCharacterEntityReferences(const std::string& text
 	}
 
     // the special ones
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&quot;"), std::string("\""));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&amp;"), std::string("&"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&apos;"), std::string("'"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&lt;"), std::string("<"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&gt;"), std::string(">"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&reg;"), std::string("®"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&copy;"), std::string("©"));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&nbsp;"), std::string(" "));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&nbsp;"), std::string(" "));
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("&deg;"), std::string("°"));
+    temp = std::regex_replace(temp, std::regex("&quot;"), std::string("\""));
+    temp = std::regex_replace(temp, std::regex("&amp;"), std::string("&"));
+    temp = std::regex_replace(temp, std::regex("&apos;"), std::string("'"));
+    temp = std::regex_replace(temp, std::regex("&lt;"), std::string("<"));
+    temp = std::regex_replace(temp, std::regex("&gt;"), std::string(">"));
+    temp = std::regex_replace(temp, std::regex("&reg;"), std::string("®"));
+    temp = std::regex_replace(temp, std::regex("&copy;"), std::string("©"));
+    temp = std::regex_replace(temp, std::regex("&nbsp;"), std::string(" "));
+    temp = std::regex_replace(temp, std::regex("&nbsp;"), std::string(" "));
+    temp = std::regex_replace(temp, std::regex("&deg;"), std::string("°"));
 
     return temp;
 }
@@ -639,7 +639,7 @@ std::string FarrPlugin::removeHttp(const std::string& url)
 {
     std::string temp(url);
 
-    temp = std::tr1::regex_replace(temp, std::tr1::regex("http://"), std::string(""));
+    temp = std::regex_replace(temp, std::regex("http://"), std::string(""));
 
     return temp;
 }
@@ -648,7 +648,7 @@ std::string FarrPlugin::removeHttp(const std::string& url)
 
 void FarrPlugin::replaceVariable(std::string& text, const Variables::value_type& variableAndValue)
 {
-    text = std::tr1::regex_replace(text, std::tr1::regex(variableAndValue.first), variableAndValue.second);
+    text = std::regex_replace(text, std::regex(variableAndValue.first), variableAndValue.second);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -656,7 +656,7 @@ void FarrPlugin::replaceVariable(std::string& text, const Variables::value_type&
 std::string FarrPlugin::replaceVariables(const std::string& text, const Variables& variables)
 {
     std::string temp(text);
-    std::for_each(variables.begin(), variables.end(), std::tr1::bind(&FarrPlugin::replaceVariable, std::tr1::ref(temp), _1));
+    std::for_each(variables.begin(), variables.end(), std::bind(&FarrPlugin::replaceVariable, std::ref(temp), _1));
     return temp;
 }
 

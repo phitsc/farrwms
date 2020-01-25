@@ -108,8 +108,8 @@ typedef int (*FpFunc_Ask_HowManyItemResultsAreReady)();
 #define EFuncName_Request_LockResults PluginFunc_Request_LockResults
 typedef BOOL (*FpFunc_Request_LockResults)(BOOL dolock);
 
-#define EFuncName_Request_ItemResultByIndex PluginFunc_Request_ItemResultByIndex
-typedef BOOL (*FpFunc_Request_ItemResultByIndex)(int resultindex, char *destbuf_path, char *destbuf_caption, char *destbuf_groupname, char *destbuf_iconfilename, void** tagvoidpp, int maxlen, E_ResultPostProcessingT *resultpostprocmodep, int *scorep, E_EntryTypeT *entrytypep);
+//#define EFuncName_Request_ItemResultByIndex PluginFunc_Request_ItemResultByIndex
+//typedef BOOL (*FpFunc_Request_ItemResultByIndex)(int resultindex, char *destbuf_path, char *destbuf_caption, char *destbuf_groupname, char *destbuf_iconfilename, void** tagvoidpp, int maxlen, E_ResultPostProcessingT *resultpostprocmodep, int *scorep, E_EntryTypeT *entrytypep);
 
 #define EFuncName_Request_TextResultCharp PluginFunc_Request_TextResultCharp
 typedef BOOL (*FpFunc_Request_TextResultCharp)(char **charp);
